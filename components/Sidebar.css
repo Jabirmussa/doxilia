@@ -97,5 +97,6 @@
 }
 
 .submenu-item:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: bold;
+  /* background-color: rgba(255, 255, 255, 0.15); */
 }
