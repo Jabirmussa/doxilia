@@ -9,17 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cookie": "^1.0.2",
+    "formidable": "^3.5.4",
+    "formidable-serverless": "^1.1.1",
+    "jose": "^6.0.12",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.4",
+    "next": "15.4.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.4.3"
+    "react-hot-toast": "^2.5.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.3",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
   }
 }

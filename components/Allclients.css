@@ -1,0 +1,99 @@
+.all-clients{
+    grid-column: 1 / -1;
+    /* max-width: 775px; */
+    /* overflow: hidden; */
+}
+.client-list-header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 42px;
+    h1{
+        font-size: 30px;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+    input {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #000;
+        border-radius: 0;
+        padding: 0;
+        padding-bottom: 10px;
+        width: 100%;
+        outline: none; 
+        box-shadow: none; 
+    }
+
+    input:hover,
+    input:focus {
+        border-bottom: 1px solid #000; 
+        outline: none;
+        box-shadow: none;
+    }
+
+}
+
+.search-client{
+    width: 427px;
+    display: flex;
+    position: relative;
+    img{
+        position: absolute;
+        right: 0;
+        top: -10px;
+    }
+}
+
+button{
+    display: flex;
+    align-self: center;
+    background: transparent;
+    color: #000;
+    span{
+        margin-top: 5px;
+    }
+}
+
+.add-client-bottom{
+    background-color: var(--green-bg);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.clients-list-item{
+    display: flex;
+    justify-content: space-between;
+    align-self: center;
+    margin-bottom: 5px;
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+}
+
+.clients-list{
+    overflow:auto;
+}
+
+.add-task-open-btn, .client-name-task{
+    display: flex;
+    justify-content: space-between;
+    align-self: center;
+    gap: 40px;
+    button{
+        &:last-child{
+            span{
+                margin-top: 2px;
+            }
+        }
+        &:first-child{
+            background-color: var(--green-bg);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    }
+}
+
+.client-name-task{
+    gap: 160px;
+}

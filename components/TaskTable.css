@@ -1,0 +1,147 @@
+.client-dashboard{
+  grid-column: 1 / -1;
+}
+
+.task-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 775px;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.task-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 22px 30px;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.task-item {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+  cursor: pointer;
+  &:hover{
+    background: var(--red-bg);
+    .toggle-btn, .status-color, .task-row{
+      color: #fff;
+    }
+    .status-dot{
+      background-color: #fff;
+    }
+  }
+}
+
+.toggle-btn {
+  padding: 4px 10px;
+  color: #000;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.status-row{
+  font-weight: bold;
+  display: flex;
+  align-self: center;
+}
+.status-dot {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.status-color.past{
+  color: var(--red-bg);
+}
+.status-color.checking{
+   color: var(--green-bg);
+}
+
+.status-dot.checking{
+   background-color: var(--green-bg);
+}
+
+.status-color.upcoming{
+  color: var(--orange-bg);
+}
+.status-dot.upcoming {
+  background-color: var(--orange-bg);
+}
+
+.status-dot.past {
+  background-color: var(--red-bg);
+}
+
+.task-details {
+  padding: 22px 30px;
+  padding-top: 0;
+  background-color: #fff;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(5 , 1fr);
+  gap: 48px;
+  padding-top: 22px;
+  border-top: 1px solid var(--cream-bg);
+  .detail-item{
+    position: relative;
+    display: flex;
+    gap: 14px;
+    flex-direction: column;
+
+    &::after{
+      content: '';
+      position: absolute;
+      width: 1px;
+      height: calc(100% + 44px);
+      left: -30px;
+      top: -22px;
+      background-color: var(--cream-bg);
+    }
+    &:first-child::after{
+      display: none;
+    }
+    a{
+      text-decoration: underline;
+    }
+    strong{
+      text-transform: uppercase;
+    }
+    input{
+      padding: 0;
+      width: 88%;
+      border-radius: 0;
+      cursor: pointer;
+    }
+  }
+}
+
+.task-desc {
+  margin-top: 8px;
+  color: #333;
+}
+
+
+.payment-id{
+  position: relative;
+}
+.copy{
+  position: absolute;
+  top: 0;
+  right: -3px;
+}

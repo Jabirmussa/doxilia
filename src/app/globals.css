@@ -1,14 +1,20 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FFFFFF;
+  --foreground: #1E1E1E;
+  --green-bg: #B0E298;
+  --cream-bg: #FFF8F0;
+  --red-bg: #E45858;
+  --orange-bg: #F47C48;
+  --blue-bg: #5D3FD3;
 }
 
+/* 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 html,
 body {
@@ -19,7 +25,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -39,4 +45,85 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+.dashboard {
+  display: flex;
+  justify-content: space-between;
+  height: 100dvh;
+  width: 100%;
+  flex-direction: column;
+  background-color: var(--foreground);
+
+  @media screen and (min-width: 60rem) {
+    flex-direction: row;
+
+    aside {
+      width: 16.75rem;
+      flex-shrink: 0; 
+    }
+
+    main {
+      flex: 1;
+    }
+  }
+
+  main {
+    background-color: var(--cream-bg);
+    border-top-left-radius: 1.25rem;
+    border-bottom-left-radius: 1.25rem;
+  }
+
+}
+
+
+.dashboard-content{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3.75rem 1.75rem ;
+  padding-top: 45px;
+  /* overflow: hidden; */
+  /* display: block; */
+  @media screen and (min-width: 48rem) {   
+    grid-template-columns: repeat(11, 1fr);
+    gap: 4rem 2.5rem ;
+    padding: 110px;
+  }
+  /* input,
+  select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    background-color: #fff;
+    color: #1E1E1E;
+  } */
+   h1{
+    grid-row: 1;
+    font-size: 30px;
+    font-weight: 400;
+    margin-bottom: 42px;
+   }
+}
+
+input, select, textarea{
+    padding: 20px  30px;
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    /* margin-bottom: 24px; */
+    color: #5c5a5a;
+}
+
+button{
+  border: none;
+  cursor: pointer;
+}
+
+li{
+  list-style: none;
+}
+.not-selected{
+  grid-column: 4/ span 4;
+  align-self: center;
+  color: var(--red-bg);
 }
