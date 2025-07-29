@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const renderMainContent = () => {
         switch (activeScreen) {
             case 'dashboard':
-            return <h1>Bem-vindo ao Painel do Admin</h1>;
+            return <Allclients />;
             case 'add-client':
             return <AddClient />;
             case 'documents':
