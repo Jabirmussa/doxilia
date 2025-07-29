@@ -4,10 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest) {
   await connectDB();
 
   try {
+    const id = req.nextUrl.pathname.split('/').pop();
+
+    if (!id) {
+      return NextResponse.json({ message: "ID da tarefa não informado." }, { status: 400 });
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File;
 
@@ -30,9 +36,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     const fileUrl = `/uploads/${fileName}`;
 
-    // Atualizar apenas o campo `upload` da task
+    // Atualiza a task com o link do upload
     const task = await Task.findByIdAndUpdate(
-      params.id,
+      id,
       { upload: fileUrl },
       { new: true }
     );
