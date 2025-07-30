@@ -81,17 +81,18 @@ export default function AddTask() {
     try {
       const data = new FormData();
 
+      // Se tiver guide, muda o status automaticamente para "OPEN"
+      const finalStatus = guideFile ? "OPEN" : formData.status;
+
+      data.append("status", finalStatus);
+
       Object.entries(formData).forEach(([key, value]) => {
-        data.append(key, value);
+        if (key !== "status") data.append(key, value);
       });
 
-      if (!guideFile) {
-        toast.error("O PDF da guia (guide) é obrigatório!");
-        setLoading(false);
-        return;
+      if (guideFile) {
+        data.append("guide", guideFile);
       }
-
-      data.append("guide", guideFile);
 
       if (uploadFile) {
         data.append("upload", uploadFile);
@@ -150,6 +151,7 @@ export default function AddTask() {
             <option value="UPCOMING">UPCOMING</option>
             <option value="CHECKING">CHECKING</option>
             <option value="OPEN">OPEN</option>
+            <option value="OPEN">CLOSE</option>
           </select>
 
           <label>Client</label>
@@ -230,14 +232,13 @@ export default function AddTask() {
             required
           />
 
-          <label>Guide (PDF obrigatório)</label>
+          <label>Guide (PDF if have)</label>
           <input
             type="file"
             name="guide"
             accept="application/pdf"
             onChange={handleFileChange}
             className={styles.inputItem}
-            required
           />
 
           {accountType === "admin" && (

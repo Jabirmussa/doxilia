@@ -26,15 +26,15 @@ export async function POST(req: Request) {
     const who = formData.get('who');
     const payment_id = formData.get('payment_id') || '';
 
-    const guideFile = formData.get('guide') as File;
+    const guideFile = formData.get('guide') as File | null;
     const uploadFile = formData.get('upload') as File | null;
 
     if (
       !status || !client_id || !accountant_id || isNaN(amount) ||
-      !period || !due_date || !what || !who || !guideFile
+      !period || !due_date || !what || !who
     ) {
       return NextResponse.json({
-        message: 'Campos obrigatórios em falta! (guide é obrigatório)',
+        message: 'Campos obrigatórios em falta!',
       }, { status: 400 });
     }
 
@@ -54,11 +54,9 @@ export async function POST(req: Request) {
       return `/uploads/${filename}`;
     };
 
-    // Salvar os arquivos
-    const guideUrl = await saveFile(guideFile);
+    const guideUrl = guideFile ? await saveFile(guideFile) : '';
     const uploadUrl = uploadFile ? await saveFile(uploadFile) : '';
 
-    // Criar nova tarefa
     const newTask = new Task({
       status,
       client_id,
@@ -83,6 +81,7 @@ export async function POST(req: Request) {
     }, { status: 500 });
   }
 }
+
 
 // GET - Buscar tasks (pode filtrar por id via query param ?id=xxx)
 export async function GET(req: Request) {

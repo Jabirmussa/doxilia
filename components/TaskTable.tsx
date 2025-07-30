@@ -31,6 +31,7 @@ const accId = typeof window !== "undefined" ? localStorage.getItem("acc_id") : n
 const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [clientNames, setClientNames] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     async function fetchTasks() {
@@ -48,13 +49,36 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
         });
 
         setTasks(filtered);
+        fetchClientNames(filtered); // Chama a função aqui depois de setar as tasks
       } catch (err) {
         console.error("Erro no fetch de tasks", err);
       }
     }
 
+    async function fetchClientNames(taskList: Task[]) {
+      const namesMap: { [key: string]: string } = {};
+
+      const uniqueClientIds = [...new Set(taskList.map(task => task.client_id).filter(Boolean))];
+
+      await Promise.all(uniqueClientIds.map(async (id) => {
+        try {
+          const res = await fetch(`/api/clients/${id}`);
+          if (!res.ok) throw new Error("Erro ao buscar cliente");
+          const clientData = await res.json();
+          namesMap[id!] = clientData.name;
+        } catch (error) {
+          console.error("Erro ao buscar cliente com ID:", id, error);
+        }
+      }));
+
+      setClientNames(namesMap);
+    }
+
     fetchTasks();
   }, []);
+
+
+
 
 
   const handleToggle = (index: number) => {
@@ -108,10 +132,23 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
     }
   };
 
+  const formatFilename = (url: string) => {
+    if (!url) return "";
+
+    const parts = url.split('/');
+    const filename = parts[parts.length - 1];
+    const withoutExtension = filename.replace('.pdf', '');
+    const nameWithoutId = withoutExtension.replace(/^[0-9]+_/, '');
+    const cleaned = nameWithoutId.replace(/-/g, '_'); 
+    return cleaned;
+  };
+
+
   return (
     <div className="task-list">
       <div className="task-header">
         <span>Status</span>
+        {role === 'accountant' &&(<span>Client</span>)}
         <span>Due Date</span>
         <span>What</span>
         <span>Who</span>
@@ -147,6 +184,9 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
                 {task.status.toUpperCase()}
               </span>
             </span>
+            {role === 'accountant' &&(
+              <span>{clientNames[task.client_id ?? ""] ?? "Carregando..."}</span>
+            )}
             <span>
               {new Date(task.due_date).toLocaleDateString("en-US", {
                 day: "2-digit",
@@ -166,56 +206,83 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
           {expandedIndex === idx && (
             <div className="task-details">
               <div className="detail-grid">
-                <div className="detail-item">
-                  <span className="payment-id">
-                    <strong>Payment ID</strong>
-                    <img
-                      className="copy"
-                      src="/copy.png"
-                      alt="copy-png"
-                      style={{ cursor: "pointer", marginLeft: "8px" }}
-                      onClick={() => copyToClipboard(task.payment_id)}
-                      title="Copy Payment ID"
-                    />
-                  </span>
-                  <span>{task.payment_id}</span>
-                </div>
+                {role === 'client' &&(
+                  <>
+                    <div className="detail-item">
+                      <span className="payment-id">
+                        <strong>Payment ID</strong>
+                        <img
+                          className="copy"
+                          src="/copy.png"
+                          alt="copy-png"
+                          style={{ cursor: "pointer", marginLeft: "8px" }}
+                          onClick={() => copyToClipboard(task.payment_id)}
+                          title="Copy Payment ID"
+                        />
+                      </span>
+                      <span>{task.payment_id}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span>
+                        <strong>Amount</strong>
+                      </span>
+                      <span>{task.amount}.00 mzn</span>
+                    </div>
+                    <div className="detail-item">
+                      <span>
+                        <strong>Period</strong>
+                      </span>
+                      <span>{formatPeriod(task.period)}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span>
+                        <strong>Guide</strong>{" "}
+                      </span>
+                      <a href={task.guide || "#"} target="_blank" rel="noreferrer">
+                        View PDF
+                      </a>
+                    </div>
+                    <div className="detail-item">
+                      <strong>Upload</strong>{" "}
+                      <input
+                        type="file"
+                        name="uploadLink"
+                        onChange={(e) => handleUpload(e, task._id)}
+                      />
+                      {task?.upload && (
+                        <a href={task.upload} target="_blank" rel="noreferrer">
+                        Check (PDF)
+                        </a>
+                      )}
 
-                <div className="detail-item">
-                  <span>
-                    <strong>Amount</strong>
-                  </span>
-                  <span>{task.amount}.00 mzn</span>
-                </div>
-                <div className="detail-item">
-                  <span>
-                    <strong>Period</strong>
-                  </span>
-                  <span>{formatPeriod(task.period)}</span>
-                </div>
-                <div className="detail-item">
-                  <span>
-                    <strong>Guide</strong>{" "}
-                  </span>
-                  <a href={task.guide || "#"} target="_blank" rel="noreferrer">
-                    View PDF
-                  </a>
-                </div>
-                <div className="detail-item">
-                  <strong>Upload</strong>{" "}
-                  <input
-                    type="file"
-                    name="uploadLink"
-                    onChange={(e) => handleUpload(e, task._id)}
-                  />
-                  {task?.upload && (
-                    <a href={task.upload} target="_blank" rel="noreferrer">
-                    Check (PDF)
-                    </a>
-                  )}
-
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
+
+                {role === 'accountant' &&(
+                  <div className="detail-grid-accountant">
+                    {task?.upload && (
+                      <>
+                        <div className="detail-item">
+                            <a href={task.upload} target="_blank" rel="noreferrer">
+                              <img src="/file-text.png" alt="" />
+                              <span>{formatFilename(task.upload)}</span>
+                            </a>
+                        </div>
+                        <button className="aprove-btn">
+                          <img src="/x.png" alt="" />
+                          <span>Approve file</span>
+                        </button>
+                        <button className="reject-btn">
+                          <img src="/check.png" alt="" />
+                          <span>Reject file</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+
             </div>
           )}
         </div>

@@ -5,7 +5,7 @@ const taskSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['UPCOMING', 'CHECKING', 'OPEN'],
+    enum: ['UPCOMING', 'CHECKING', 'OPEN', 'CLOSE'],
     default: 'UPCOMING',
   },
   client_id: {
@@ -43,7 +43,6 @@ const taskSchema = new Schema({
   },
   guide: {
     type: String,
-    required: true,
   },
   upload: {
     type: String,

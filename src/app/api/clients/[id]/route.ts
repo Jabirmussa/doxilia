@@ -3,8 +3,7 @@ import Client from '@/models/Client';
 import { NextResponse } from 'next/server';
 
 // GET por ID
-export async function GET(_: Request, context: { params: { id: string } }) {
-  const { params } = await context;
+export async function GET(_request: Request, { params }: { params: { id: string } }) {
   await connectDB();
   const client = await Client.findById(params.id);
   if (!client) return new Response('Client not found', { status: 404 });
@@ -12,8 +11,7 @@ export async function GET(_: Request, context: { params: { id: string } }) {
 }
 
 // PUT (update)
-export async function PUT(req: Request, context: { params: { id: string } }) {
-  const { params } = await context;
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   await connectDB();
   const data = await req.json();
   const updated = await Client.findByIdAndUpdate(params.id, data, { new: true });
@@ -22,8 +20,7 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
 }
 
 // DELETE
-export async function DELETE(_: Request, context: { params: { id: string } }) {
-  const { params } = context;
+export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
   await connectDB();
   const deleted = await Client.findByIdAndDelete(params.id);
   if (!deleted) return new Response('Client not found', { status: 404 });

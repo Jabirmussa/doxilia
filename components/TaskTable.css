@@ -64,9 +64,10 @@
   border-radius: 50%;
   margin-right: 6px;
 }
-.status-color.past{
-  color: var(--red-bg);
+.status-color.open{
+  color: var(--blue-bg);
 }
+
 .status-color.checking{
    color: var(--green-bg);
 }
@@ -82,8 +83,8 @@
   background-color: var(--orange-bg);
 }
 
-.status-dot.past {
-  background-color: var(--red-bg);
+.status-dot.open {
+  background-color: var(--blue-bg);
 }
 
 .task-details {
@@ -92,7 +93,7 @@
   background-color: #fff;
 }
 
-.detail-grid {
+.detail-grid, .detail-grid-accountant{
   display: grid;
   grid-template-columns: repeat(5 , 1fr);
   gap: 48px;
@@ -118,6 +119,12 @@
     }
     a{
       text-decoration: underline;
+      display: flex;
+      align-self: center;
+      gap: 10px;
+      background-color: var(--cream-bg);
+      padding: 10px;
+      border-radius: 10px;
     }
     strong{
       text-transform: uppercase;
@@ -129,6 +136,26 @@
       cursor: pointer;
     }
   }
+}
+.detail-grid-accountant{
+  grid-template-columns: repeat(3 , 1fr);
+}
+
+.aprove-btn, .reject-btn{
+  padding: 10px;
+  border-radius: 10px;
+  color: #fff;
+  span{
+    padding-left: 10px;
+  }
+}
+
+.aprove-btn{
+  background-color: var(--green-bg);
+}
+
+.reject-btn{
+  background-color: var(--red-bg);
 }
 
 .task-desc {
