@@ -11,14 +11,14 @@ export async function PUT(req: NextRequest) {
     const id = req.nextUrl.pathname.split('/').pop();
 
     if (!id) {
-      return NextResponse.json({ message: "ID da tarefa não informado." }, { status: 400 });
+      return NextResponse.json({ message: "Task ID not provided." }, { status: 400 });
     }
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ message: "Nenhum arquivo enviado." }, { status: 400 });
+      return NextResponse.json({ message: "No files sent." }, { status: 400 });
     }
 
     // Salvar o arquivo
@@ -36,7 +36,6 @@ export async function PUT(req: NextRequest) {
 
     const fileUrl = `/uploads/${fileName}`;
 
-    // Atualiza a task com o link do upload
     const task = await Task.findByIdAndUpdate(
       id,
       { upload: fileUrl },
@@ -44,12 +43,12 @@ export async function PUT(req: NextRequest) {
     );
 
     if (!task) {
-      return NextResponse.json({ message: "Tarefa não encontrada." }, { status: 404 });
+      return NextResponse.json({ message: "Task not found." }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Upload feito com sucesso!", uploadLink: fileUrl, task });
+    return NextResponse.json({ message: "Upload successful!", uploadLink: fileUrl, task });
   } catch (err) {
-    console.error("Erro ao fazer upload:", err);
-    return NextResponse.json({ message: "Erro interno ao fazer upload." }, { status: 500 });
+    console.error("Error uploading:", err);
+    return NextResponse.json({ message: "Internal error while uploading." }, { status: 500 });
   }
 }

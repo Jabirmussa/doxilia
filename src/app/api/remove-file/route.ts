@@ -10,7 +10,7 @@ export async function DELETE(req: Request) {
     const { taskId, fileType } = body;
 
     if (!taskId || !["upload", "guide"].includes(fileType)) {
-      return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid data." }, { status: 400 });
     }
 
     await Task.findByIdAndUpdate(taskId, {
@@ -19,7 +19,7 @@ export async function DELETE(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("Erro ao remover ficheiro:", err);
+    console.error("Error removing file:", err);
     return NextResponse.json({ error: "Erro interno." }, { status: 500 });
   }
 }

@@ -70,6 +70,6 @@ export async function POST(req) {
 
   } catch (error) {
     console.error('Erro na API login:', error);
-    return new Response(JSON.stringify({ message: 'Erro interno no servidor' }), { status: 500 });
+    return new Response(JSON.stringify({ message: 'Internal server error' }), { status: 500 });
   }
 }

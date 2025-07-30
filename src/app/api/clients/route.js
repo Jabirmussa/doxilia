@@ -27,18 +27,18 @@ export async function POST(req) {
     const acc_id = role === 'admin' ? body.acc_id : tokenAccId;
 
     if (!acc_id) {
-      return new Response(JSON.stringify({ message: 'ID do contador (acc_id) é obrigatório' }), { status: 400 });
+      return new Response(JSON.stringify({ message: 'Counter ID (acc_id) is required' }), { status: 400 });
     }
 
     const { name, email, nuit, password } = body;
 
     if (!name || !email || !nuit || !password) {
-      return new Response(JSON.stringify({ message: 'Campos obrigatórios faltando' }), { status: 400 });
+      return new Response(JSON.stringify({ message: 'Missing required fields' }), { status: 400 });
     }
 
     const exists = await Client.findOne({ email });
     if (exists) {
-      return new Response(JSON.stringify({ message: 'Este e-mail já está associado a um cliente.' }), {
+      return new Response(JSON.stringify({ message: 'This email is already associated with a customer.' }), {
         status: 409,
       });
     }
@@ -54,7 +54,7 @@ export async function POST(req) {
     console.error("❌ Erro no POST /clients:", err.message);
 
     return new Response(JSON.stringify({
-      message: err.code === 11000 ? 'Email duplicado' : err.message || 'Erro no servidor',
+      message: err.code === 11000 ? 'Duplicate email' : err.message || 'Server error',
     }), {
       status: err.code === 11000 ? 409 : 500,
       headers: { 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ export async function GET() {
 
   } catch (err) {
     console.error("❌ Erro no GET /clients:", err.message);
-    return new Response(JSON.stringify({ message: err.message || 'Erro no servidor' }), {
+    return new Response(JSON.stringify({ message: err.message || 'Server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -95,13 +95,13 @@ export async function PUT(req) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-    if (!id) return new Response(JSON.stringify({ message: 'ID do cliente é obrigatório' }), { status: 400 });
+    if (!id) return new Response(JSON.stringify({ message: 'Customer ID is required' }), { status: 400 });
 
     const query = role === 'admin' ? { _id: id } : { _id: id, acc_id };
     const updated = await Client.findOneAndUpdate(query, data, { new: true });
 
     if (!updated) {
-      return new Response(JSON.stringify({ message: 'Cliente não encontrado ou acesso negado' }), { status: 404 });
+      return new Response(JSON.stringify({ message: 'Client not found or access denied' }), { status: 404 });
     }
 
     return new Response(JSON.stringify(updated), {
@@ -111,7 +111,7 @@ export async function PUT(req) {
 
   } catch (err) {
     console.error("❌ Erro no PUT /clients:", err.message);
-    return new Response(JSON.stringify({ message: err.message || 'Erro no servidor' }), {
+    return new Response(JSON.stringify({ message: err.message || 'Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -126,23 +126,23 @@ export async function DELETE(req) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-    if (!id) return new Response(JSON.stringify({ message: 'ID do cliente é obrigatório' }), { status: 400 });
+    if (!id) return new Response(JSON.stringify({ message: 'Customer ID is required' }), { status: 400 });
 
     const query = role === 'admin' ? { _id: id } : { _id: id, acc_id };
     const deleted = await Client.findOneAndDelete(query);
 
     if (!deleted) {
-      return new Response(JSON.stringify({ message: 'Cliente não encontrado ou acesso negado' }), { status: 404 });
+      return new Response(JSON.stringify({ message: 'Client not found or access denied' }), { status: 404 });
     }
 
-    return new Response(JSON.stringify({ message: 'Cliente deletado com sucesso' }), {
+    return new Response(JSON.stringify({ message: 'Client successfully deleted' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
 
   } catch (err) {
     console.error("❌ Erro no DELETE /clients:", err.message);
-    return new Response(JSON.stringify({ message: err.message || 'Erro no servidor' }), {
+    return new Response(JSON.stringify({ message: err.message || 'Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

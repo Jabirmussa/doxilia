@@ -15,9 +15,9 @@ export default function UnauthorizedPage() {
       textAlign: 'center'
     }}>
       <img src="/logo.png" alt="logo" />
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', marginTop: '2rem' }}>Acesso Negado!</h1>
+      <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', marginTop: '2rem' }}>Access denied!</h1>
       <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
-        Você não tem permissão para acessar esta página.
+        You do not have permission to access this page.
       </p>
       <a
         href="/"
@@ -30,7 +30,7 @@ export default function UnauthorizedPage() {
           fontWeight: 'bold'
         }}
       >
-        Voltar para a página inicial
+        Return to home page
       </a>
     </div>
   );

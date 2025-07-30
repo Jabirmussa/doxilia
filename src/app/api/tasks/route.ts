@@ -75,11 +75,11 @@ export async function POST(req: Request) {
 
     await newTask.save();
 
-    return NextResponse.json({ message: 'Tarefa criada com sucesso!', task: newTask });
+    return NextResponse.json({ message: 'Task created successfully!', task: newTask });
   } catch (err) {
-    console.error('Erro ao criar tarefa:', err);
+    console.error('Error creating task:', err);
     return NextResponse.json({
-      message: 'Erro interno ao criar tarefa.',
+      message: 'Internal error creating task.',
     }, { status: 500 });
   }
 }
@@ -96,7 +96,7 @@ export async function GET(req: Request) {
       // Buscar task específica
       const task = await Task.findById(id);
       if (!task) {
-        return NextResponse.json({ message: 'Tarefa não encontrada.' }, { status: 404 });
+        return NextResponse.json({ message: 'Task not found.' }, { status: 404 });
       }
       return NextResponse.json(task);
     } else {
@@ -105,8 +105,8 @@ export async function GET(req: Request) {
       return NextResponse.json({ tasks });
     }
   } catch (err) {
-    console.error('Erro ao buscar tarefas:', err);
-    return NextResponse.json({ message: 'Erro interno ao buscar tarefas.' }, { status: 500 });
+    console.error('Error fetching tasks:', err);
+    return NextResponse.json({ message: 'Internal error while fetching tasks.' }, { status: 500 });
   }
 }
 
@@ -119,21 +119,21 @@ export async function DELETE(req: Request) {
     const id = url.searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ message: 'ID da tarefa obrigatório.' }, { status: 400 });
+      return NextResponse.json({ message: 'Mandatory Task ID.' }, { status: 400 });
     }
 
     const task = await Task.findByIdAndDelete(id);
 
     if (!task) {
-      return NextResponse.json({ message: 'Tarefa não encontrada.' }, { status: 404 });
+      return NextResponse.json({ message: 'Task not found.' }, { status: 404 });
     }
 
     if(task.guide) fs.unlinkSync(path.join(process.cwd(), 'public', task.guide));
 
-    return NextResponse.json({ message: 'Tarefa deletada com sucesso!' });
+    return NextResponse.json({ message: 'Task deleted successfully!' });
   } catch (err) {
-    console.error('Erro ao deletar tarefa:', err);
-    return NextResponse.json({ message: 'Erro interno ao deletar tarefa.' }, { status: 500 });
+    console.error('Error deleting task:', err);
+    return NextResponse.json({ message: 'Internal error while deleting task.' }, { status: 500 });
   }
 }
 
@@ -160,12 +160,12 @@ export async function PUT(req: Request) {
     } = body;
 
     if (!id) {
-      return NextResponse.json({ message: 'ID da tarefa obrigatório para atualização.' }, { status: 400 });
+      return NextResponse.json({ message: 'Task ID required for update.' }, { status: 400 });
     }
 
     const task = await Task.findById(id);
     if (!task) {
-      return NextResponse.json({ message: 'Tarefa não encontrada.' }, { status: 404 });
+      return NextResponse.json({ message: 'Task not founded' }, { status: 404 });
     }
 
     if (status) task.status = status;
@@ -182,9 +182,9 @@ export async function PUT(req: Request) {
 
     await task.save();
 
-    return NextResponse.json({ message: 'Tarefa atualizada com sucesso!', task });
+    return NextResponse.json({ message: 'Task updated successfully!', task });
   } catch (err) {
-    console.error('Erro ao atualizar tarefa:', err);
-    return NextResponse.json({ message: 'Erro interno ao atualizar tarefa.' }, { status: 500 });
+    console.error('Error updating task:', err);
+    return NextResponse.json({ message: 'Internal error while updating task.' }, { status: 500 });
   }
 }

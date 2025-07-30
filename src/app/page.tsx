@@ -22,7 +22,7 @@ export default function Index() {
       });
 
       if (!res.ok) {
-        let errorMsg = 'Erro no login';
+        let errorMsg = 'Login error';
         try {
           const data = await res.json();
           errorMsg = typeof data.message === 'string' ? data.message : errorMsg;
@@ -36,7 +36,7 @@ export default function Index() {
 
 
      const data = await res.json();
-      toast.success('Login realizado com sucesso!');
+      toast.success('Login successful!');
 
       localStorage.setItem('role', data.userType);
 
@@ -56,7 +56,7 @@ export default function Index() {
       else window.location.href = '/';
 
     } catch (err) {
-      toast.error('Erro de rede, tenta de novo');
+      toast.error('Network error, please try again');
       console.error(err);
     } finally {
       setLoading(false);

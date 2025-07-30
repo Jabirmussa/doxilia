@@ -37,7 +37,7 @@ export default function AllFiles() {
   };
 
   const handleRemove = async (taskId: string, fileType: "upload" | "guide") => {
-    const confirmDelete = confirm("Tens certeza que queres apagar esse ficheiro?");
+    const confirmDelete = confirm("Are you sure you want to delete this file?");
     if (!confirmDelete) return;
 
     try {
@@ -54,10 +54,10 @@ export default function AllFiles() {
           )
         );
       } else {
-        alert("Erro ao remover o ficheiro");
+        alert("Error removing file");
       }
     } catch (err) {
-      console.error("Erro ao remover o ficheiro:", err);
+      console.error("Error removing file:", err);
     }
   };
 
@@ -80,9 +80,9 @@ export default function AllFiles() {
       <h1>📄 Filearchive overzicht</h1>
 
       {loading ? (
-        <p>Carregando arquivos...</p>
+        <p>Loading files...</p>
       ) : filteredTasks.length === 0 ? (
-        <p>Nenhum comprovativo disponível.</p>
+        <p>No proof available.</p>
       ) : (
         <ul className="files-items">
           {filteredTasks.map((task) => (

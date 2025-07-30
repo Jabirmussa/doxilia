@@ -20,8 +20,8 @@ export default function AddTask() {
   const [clients, setClients] = useState<Client[]>([]);
   const [accountants, setAccountants] = useState<Accountant[]>([]);
   const [loading, setLoading] = useState(false);
-  const [guideFile, setGuideFile] = useState<File | null>(null); // PDF obrigatório
-  const [uploadFile, setUploadFile] = useState<File | null>(null); // PDF opcional
+  const [guideFile, setGuideFile] = useState<File | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null); 
 
   const [formData, setFormData] = useState({
     status: "UPCOMING",

@@ -21,6 +21,12 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   const commonLinks: LinkItem[] = [
     { label: 'Dashboard', screen: 'dashboard', img: '/bell.png' },
     { label: 'Documents', screen: 'documents', img: '/columns.png' },
+    { 
+      label: 'Account', 
+      screen: 'account', 
+      img: '/user.png',
+      submenu: ['Settings', 'Logout'],
+    },
   ];
 
   const adminLinks: LinkItem[] = [
@@ -45,12 +51,6 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   ];
 
   const clientLinks: LinkItem[] = [
-    { 
-      label: 'Account', 
-      screen: 'documents', 
-      img: '/user.png',
-      submenu: ['Settings', 'Logout'],
-    },
   ];
 
   const accountantLinks: LinkItem[] = [

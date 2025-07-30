@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import TaskTable from "@/components/TaskTable";
 import Sidebar from '@/components/SidebarTemp';
 import AddClient from '@/components/AddClient';
@@ -9,43 +11,70 @@ import "@/components/TaskTable.css";
 import "@/components/Sidebar.css";
 import AddTask from '@/components/AddTask';
 import AllFiles from '@/components/AllFiles';
+import Account from '@/components/Account';
 
 const AccountantDashboard = () => {
-  const [activeScreen, setActiveScreen] = useState<string>('dashboard')
+  const [activeScreen, setActiveScreen] = useState<string>('dashboard');
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    router.push('/');
+  };
+
+  useEffect(() => {
+    if (activeScreen === 'logout') {
+      handleLogout();
+    }
+  }, [activeScreen]);
 
   const renderMainContent = () => {
-      switch (activeScreen) {
-          case 'dashboard':
-          return <h1>Bem-vindo ao Painel do Contador</h1>;
-          case 'documents':
-          return <AllFiles />;
-          case 'add-client':
-          return <AddClient />;
-          case 'all-clients':
-          return <Allclients />;
-          case 'clients':
-          return <Allclients />;
-          case 'tasks':
-          return (<div className="client-dashboard"><TaskTable type="accountant"/></div>);
-          case 'add-tasks':
-          return <AddTask />;
-          case 'all-tasks':
-          return (<div className="client-dashboard"><TaskTable type="accountant"/></div>);
-          default:
-          return <div className='not-selected'><h1>Selecione uma opção no sub-menu</h1></div>;
-      }
+    switch (activeScreen) {
+      case 'dashboard':
+        return (
+          <div className="client-dashboard">
+            <h1>Dashboard</h1>
+            <TaskTable type="accountant" />
+          </div>
+        );
+      case 'documents':
+        return <AllFiles />;
+      case 'add-client':
+        return <AddClient />;
+      case 'account':
+      case 'settings':
+      return <Account />;
+      case 'all-clients':
+      case 'clients':
+        return <Allclients />;
+      case 'tasks':
+      case 'all-tasks':
+        return (
+          <div className="client-dashboard">
+            <TaskTable type="accountant" />
+          </div>
+        );
+      case 'add-tasks':
+        return <AddTask />;
+      default:
+        return (
+          <div className="not-selected">
+            <h1>Select an option from the submenu</h1>
+          </div>
+        );
+    }
   };
 
   return (
     <section className="dashboard">
-        <Sidebar
-            role="accountant"
-            onSelect={(screen) => setActiveScreen(screen)} 
-        />
+      <Sidebar
+        role="accountant"
+        onSelect={(screen) => setActiveScreen(screen)}
+      />
 
-        <main className='dashboard-content'>
-            {renderMainContent()}
-        </main>
+      <main className="dashboard-content">
+        {renderMainContent()}
+      </main>
     </section>
   );
 };
