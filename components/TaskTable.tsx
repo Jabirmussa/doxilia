@@ -80,10 +80,21 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
 
 
 
+  const hasDetails = (task: Task): boolean => {
+    if (role === "client") {
+      return Boolean(task.payment_id || task.amount || task.period || task.guide || task.upload);
+    }
+
+    return Boolean(task.upload);
+  };
 
   const handleToggle = (index: number) => {
+    const task = tasks[index];
+    if (!hasDetails(task)) return;
+    
     setExpandedIndex((prev) => (prev === index ? null : index));
   };
+  
   function formatPeriod(dateString: string) {
   const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -143,7 +154,6 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
     return cleaned;
   };
 
-
   return (
     <div className="task-list">
       <div className="task-header">
@@ -156,7 +166,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
       </div>
 
       {tasks.map((task, idx) => (
-        <div key={idx} className="task-item">
+        <div key={idx} onClick={() => handleToggle(idx)}  className="task-item">
           <div className="task-row">
             <span className="status-row">
               <span
@@ -184,7 +194,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
                 {task.status.toUpperCase()}
               </span>
             </span>
-            {role === 'accountant' &&(
+            {role !== 'client'&&(
               <span>{clientNames[task.client_id ?? ""] ?? "Carregando..."}</span>
             )}
             <span>
@@ -197,9 +207,19 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
             <span>{task.what}</span>
             <span>{task.who}</span>
             <span>
-              <button onClick={() => handleToggle(idx)} className="toggle-btn">
-                {expandedIndex === idx ? "Close ▲" : "Open ▶"}
+              <button
+                className={`toggle-btn ${expandedIndex === idx ? "active" : ""}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggle(idx);
+                }}
+              >
+                <span>{expandedIndex === idx ? "Close" : "Open"}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M7.93665 16.25L13.1866 11L7.93665 5.75" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
+
             </span>
           </div>
 
@@ -260,7 +280,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
                 )}
               </div>
 
-                {role === 'accountant' &&(
+                {role !== 'client' &&(
                   <div className="detail-grid-accountant">
                     {task?.upload && (
                       <>

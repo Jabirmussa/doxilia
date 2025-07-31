@@ -81,7 +81,6 @@ export default function AddTask() {
     try {
       const data = new FormData();
 
-      // Se tiver guide, muda o status automaticamente para "OPEN"
       const finalStatus = guideFile ? "OPEN" : formData.status;
 
       data.append("status", finalStatus);
