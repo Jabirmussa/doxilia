@@ -146,6 +146,7 @@ export default function AddTask() {
             onChange={handleChange}
             className={styles.inputItem}
             required
+            style={{ cursor: 'not-allowed', pointerEvents: 'none'}}
           >
             <option value="UPCOMING">UPCOMING</option>
             <option value="CHECKING">CHECKING</option>

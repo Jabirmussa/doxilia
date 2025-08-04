@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Schema, model, models } from 'mongoose';
+import { type } from 'os';
 
 const taskSchema = new Schema({
   status: {
@@ -45,6 +46,9 @@ const taskSchema = new Schema({
     type: String,
   },
   upload: {
+    type: String,
+  },
+  description: {
     type: String,
   },
 }, { timestamps: true });

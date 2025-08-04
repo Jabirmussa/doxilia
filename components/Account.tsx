@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import styles from "@/components/addClient.module.css";
+import toast from 'react-hot-toast';
 
 type UserType = 'client' | 'accountant' | 'admin';
 
@@ -71,14 +72,14 @@ export default function Account() {
       });
 
       if (!res.ok) throw new Error('Erro ao salvar dados');
-      alert('Dados salvos com sucesso!');
+      toast.success('Dados salvos com sucesso!');
     } catch (err) {
       console.error(err);
-      alert('Erro ao salvar!');
+      toast.error('Erro ao salvar!');
     }
   };
 
-  if (loading) return <p>Carregando dados...</p>;
+  if (loading) return <p>Loading...</p>;
 
   return (
     <form className={styles.form} onSubmit={(e) => {

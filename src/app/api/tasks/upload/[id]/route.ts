@@ -1,5 +1,6 @@
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
+import Notification from '@/models/Notification';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
@@ -44,6 +45,22 @@ export async function PUT(req: NextRequest) {
 
     if (!task) {
       return NextResponse.json({ message: "Task not found." }, { status: 404 });
+    }
+
+    if (task.client_id) {
+      await Notification.create({
+        user_id: task.client_id,
+        message: `New document uploaded for task "${task.what}".`,
+        role: "client",
+      });
+    }
+
+    if (task.accountant_id) {
+      await Notification.create({
+        user_id: task.accountant_id,
+        message: `Client uploaded a document for task "${task.what}".`,
+        role: "accountant",
+      });
     }
 
     return NextResponse.json({ message: "Upload successful!", uploadLink: fileUrl, task });

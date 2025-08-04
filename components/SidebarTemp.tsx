@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 
 interface SidebarProps {
   role: 'admin' | 'client' | 'accountant';
@@ -17,6 +17,89 @@ interface LinkItem {
 
 const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [notificationCount, setNotificationCount] = useState<number>(0);
+  const [viewedSections, setViewedSections] = useState<string[]>([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+      if (Notification.permission === "default") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            console.log("✅ Permissão de notificação concedida!");
+          } else {
+            console.log("❌ Permissão de notificação negada.");
+          }
+        });
+      }
+    }, [])
+  useEffect(() => {
+    let lastCount = 0;
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/notifications', {
+          headers: {
+            'x-user-id': localStorage.getItem("user_id") ?? ""
+          }
+        });
+
+        const data = await res.json();
+        const newCount = data.count ?? 0;
+
+        if (newCount > lastCount && Notification.permission === "granted") {
+          new Notification("📥 Nova notificação", {
+            body: data.notifications[0]?.message ?? "Você recebeu uma nova notificação",
+            icon: "/logo.png",
+          });
+        }
+
+        lastCount = newCount;
+        setNotificationCount(newCount);
+      } catch (err) {
+        console.error("Erro ao buscar notificações", err);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("menu-is-open", menuOpen);
+  }, [menuOpen]);
+
+  const toggleMenu = () => {
+    setMenuOpen((prev) => !prev);
+  };
+
+
+  const handleLinkClick = async (screen: string, label: string) => {
+    onSelect(screen);
+
+    if (!viewedSections.includes(label)) {
+      setViewedSections(prev => [...prev, label]);
+
+      try {
+        const res = await fetch('/api/notifications', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: localStorage.getItem("user_id") ?? "",
+            section: label.toLowerCase(),
+          }),
+        });
+
+        const result = await res.json();
+        console.log(`${result.updatedCount} notificações marcadas como lidas na seção ${label}.`);
+        
+        setNotificationCount((prevCount) => Math.max(prevCount - result.updatedCount, 0));
+      } catch (err) {
+        console.error("Erro ao marcar notificações como lidas", err);
+      }
+    }
+  };
+
 
   const commonLinks: LinkItem[] = [
     { label: 'Dashboard', screen: 'dashboard', img: '/bell.png' },
@@ -78,6 +161,19 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
       <div className="logo-sidebar">
         <img src="/logo.png" alt="logo" />
       </div>
+      <div className={`humburguer-menu ${menuOpen ? "active" : ""}`} onClick={toggleMenu}>
+        <span></span>
+        <span></span>
+        <span></span>
+
+        {notificationCount > 0 && (
+          <div className="notification">
+            <span>{notificationCount}</span>
+          </div>
+        )}
+      </div>
+
+
       <nav className="menu-items">
         {[...commonLinks, ...roleLinks].map((link, i) => (
           <div
@@ -87,15 +183,19 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
             onMouseLeave={() => setHovered(null)}
           >
             <button
-              onClick={() => onSelect(link.screen)}
+              onClick={() => handleLinkClick(link.screen, link.label)}
               className="menu-link"
             >
               <img src={link.img} alt="menu-icon" />
               <div className="link-title">
                 <span>{link.label}</span>
-                <div className="notification">
-                  <span>2</span>
-                </div>
+                {(link.label === "Tasks" || link.label === "Documents" || link.label === "Dashboard") &&
+                  notificationCount > 0 &&
+                  !viewedSections.includes(link.label) && (
+                    <div className="notification">
+                      <span>{notificationCount}</span>
+                    </div>
+                  )}
               </div>
             </button>
 
@@ -117,14 +217,22 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
             )}
           </div>
         ))}
-        <Link href="" className="menu-close">
+        <Link
+          href="#"
+          className="menu-close"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleMenu();
+          }}
+        >
           <img src="/arrow-left-circle.png" alt="icon" />
-          Close menu
+          <span>Close menu</span>
         </Link>
+
       </nav>
       <button className="menu-btn">
         <img src="/whatsapp.png" alt="icon" />
-        Whatsapp-nos
+        <span>Whatsapp-nos</span>
       </button>
     </aside>
   );

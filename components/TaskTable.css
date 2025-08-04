@@ -8,25 +8,55 @@
   flex-direction: column;
   gap: 8px;
   max-width: 775px;
+  max-height: 550px;
+  overflow-y: auto;
+  @media screen and (min-width: 48rem) { 
+     max-height: 400px;
+  }
+}
+.task-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.task-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+  background-color: var(--green-bg);
+  border-radius: 10px;
 }
 
 .task-header {
-  display: flex;
   justify-content: space-between;
   padding: 10px 30px;
   font-weight: bold;
   text-transform: uppercase;
+  display: none;
+  @media screen and (min-width: 48rem) { 
+    display: flex;
+  }
 }
 
 .task-row {
   display: flex;
   justify-content: space-between;
-  padding: 22px 30px;
+  padding: 30px 30px;
   align-items: center;
   text-transform: uppercase;
+  flex-wrap: wrap;
+  /* flex-direction: column; */
+  gap: 40px;
+  @media screen and (min-width: 48rem) { 
+    padding: 10px 30px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0;
+  }
 }
 
 .task-item {
+  width: 100%;
   background: white;
   border-radius: 10px;
   overflow: hidden;
@@ -49,22 +79,39 @@
     }
   }
 }
-
+.toggle-span{
+  width: 100%;
+  @media screen and (min-width: 48rem) { 
+    width: auto;
+  }
+}
 .toggle-btn {
   position: relative;
   padding: 4px 10px;
   color: #000;
-  background: transparent;
   border: none;
   cursor: pointer;
   font-weight: bold;
   text-transform: uppercase;
   display: flex;
-  align-self: center;
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
   line-height: 23px;
+  background: var(--green-bg);
+  border-radius: 10px;
+  padding: 10px;
+
+  @media screen and (min-width: 48rem) { 
+    background: transparent;
+  }
   svg{
     position: relative;
   }
+  span{
+    margin: 0;
+  }
+
 }
 
 .toggle-btn.active svg{
@@ -104,6 +151,13 @@
 .status-dot.open {
   background-color: var(--blue-bg);
 }
+.status-dot.close {
+  background-color: var(--red-bg);
+}
+
+.status-color.close{
+  color: var(--red-bg);
+}
 
 .task-details {
   padding: 22px 30px;
@@ -112,26 +166,44 @@
 }
 
 .detail-grid, .detail-grid-accountant{
-  display: grid;
-  grid-template-columns: repeat(5 , 1fr);
-  gap: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   padding-top: 22px;
   border-top: 1px solid var(--cream-bg);
   transition: all 0.3s ease-in-out;
+
+  @media screen and (min-width: 48rem) { 
+    display: grid;
+    grid-template-columns: repeat(5 , 1fr);
+    gap: 48px;
+    padding-top: 22px;
+    border-top: 1px solid var(--cream-bg);
+  }
+  
   .detail-item{
     position: relative;
     display: flex;
     gap: 14px;
     flex-direction: column;
-
+    margin-bottom: 20px;
+    @media screen and (min-width: 48rem) { 
+      margin-bottom: 0;
+    }
     &::after{
       content: '';
       position: absolute;
-      width: 1px;
-      height: calc(100% + 44px);
-      left: -30px;
-      top: -22px;
+      width: 100%;
+      height: 1px;
+      left: 0;
+      top: -20px;
       background-color: var(--cream-bg);
+       @media screen and (min-width: 48rem) { 
+        width: 1px;
+        height: calc(100% + 5px);
+        left: -30px;
+        top: -22px;
+       }
     }
     &:first-child::after{
       display: none;
@@ -139,11 +211,15 @@
     a{
       text-decoration: underline;
       display: flex;
-      align-self: center;
+      justify-content: left;
       gap: 10px;
-      background-color: var(--cream-bg);
+      width: 100%;
       padding: 10px;
-      border-radius: 10px;
+      @media screen and (min-width: 48rem) { 
+        padding: 0;
+        background: transparent;
+        width: auto;
+      }
     }
     strong{
       text-transform: uppercase;
@@ -155,9 +231,11 @@
       cursor: pointer;
     }
   }
+
 }
 .detail-grid-accountant{
   grid-template-columns: repeat(3 , 1fr);
+  gap: 30px;
 }
 
 .aprove-btn, .reject-btn{
@@ -190,4 +268,14 @@
   position: absolute;
   top: 0;
   right: -3px;
+}
+
+.task-items{
+  position: relative;
+  display: flex;
+  align-items: center;
+  .task-trash{
+    position: absolute;
+    right: 10px;
+  }
 }

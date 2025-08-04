@@ -2,7 +2,17 @@
     grid-column: 1 / -1;
     max-width: 48.4375rem;
 }
-
+.files-items {
+  max-height: 650px;
+  overflow-y: auto;
+  padding-right: 5px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  @media screen and (min-width: 48rem) { 
+    max-height: 400px;
+  }
+}
 .files-items, li{
     display: flex;
     flex-direction: column;
@@ -13,8 +23,14 @@
         background-color: #fff;
         padding: 22px 30px;
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
         border-radius: 10px;
+        gap: 20px;
+        align-items: center;
+        @media screen and (min-width: 48rem) { 
+            flex-direction: row;
+        }
         >div, .remove-btn {
             display: flex;
             align-self: center;
@@ -78,4 +94,25 @@
   padding: 0.3rem 0.8rem;
   border-radius: 5px;
   cursor: pointer;
+}
+
+
+/* Estilo do scroll - Webkit (Chrome, Edge, Safari) */
+.files-items::-webkit-scrollbar {
+  width: 2px;
+}
+
+.files-items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.files-items::-webkit-scrollbar-thumb {
+  background-color: var(--red-bg);
+  border-radius: 10px;
+}
+
+/* Estilo do scroll - Firefox */
+.files-items {
+  scrollbar-width: thin;
+  scrollbar-color: var(--red-bg) transparent;
 }

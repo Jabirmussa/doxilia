@@ -1,9 +1,12 @@
 .sidebar{
     color: var(--cream-bg);
-    padding: 60px;
+    padding: 30px;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    @media screen and (min-width: 48rem) {
+      padding: 60px;
+    }
 }
 
 .menu-items{
@@ -19,6 +22,7 @@
     background-color: transparent;
     border: none;
     gap: 14px;
+    transition: all 1s ease; 
     span{
         font-size: 16px;
         font-weight: 400;
@@ -31,10 +35,12 @@
     background-color: var(--green-bg);
     padding: 15px 15px 15px 15px;
     border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
     gap: 4.5px;
-    color: #000;
+    span{
+      font-size: 14px;
+      font-weight: 600;
+      color: #000;
+    }
 }
 
 .link-title{
@@ -98,4 +104,66 @@
 
 .submenu-item:hover {
   font-weight: bold;
+}
+
+
+.humburguer-menu {
+  width: 30px;
+  height: 20px;
+  position: absolute;
+  right: 30px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1001; 
+  @media screen and (min-width: 48rem) {
+    display: none;
+  }
+}
+
+.humburguer-menu > span {
+  height: 3px;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: 0.3s ease-in-out;
+  transform-origin: center;
+}
+
+
+.humburguer-menu.active > span:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 5px);
+}
+
+.humburguer-menu.active > span:nth-child(2) {
+  opacity: 0;
+}
+
+.humburguer-menu.active > span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -5px);
+}
+
+@media (max-width: 48rem) {
+  body.menu-is-open .dashboard {
+    overflow: hidden;
+    position: fixed;
+    main{
+      left: 200px;
+      /* transform: skewX(-10deg); */
+      /* transition: transform 0.4s ease, right 0.4s ease; */
+    }
+  }
+}
+
+@media (min-width: 48rem) {
+  body.menu-is-open{
+    .sidebar span{
+      display: none;
+    }
+    .sidebar{
+      width: 80px;
+      /* padding: 30px; */
+    }
+  }
 }

@@ -94,9 +94,10 @@ export default function AllFiles() {
                 return (
                   <div className="file-item" key={type}>
                     <a href={file} target="_blank" rel="noreferrer">
-                      {file.split("_").slice(1).join("_")}
+                      {file.split("/").pop()?.split("_")[0]}
                     </a>
-                    <span>PDF</span>
+
+                    <span>{file.split(".").pop()?.toUpperCase()}</span>
                     <div onClick={() => setPreviewUrl(file)} className="quick-preview-btn">
                       <img src="/eye.svg" alt="eye" />
                       <span>Quick preview</span>

@@ -1,5 +1,6 @@
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
+import Notification from '@/models/Notification';
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
       !period || !due_date || !what || !who
     ) {
       return NextResponse.json({
-        message: 'Campos obrigatórios em falta!',
+        message: 'Missing required fields!',
       }, { status: 400 });
     }
 
@@ -73,6 +74,26 @@ export async function POST(req: Request) {
 
     await newTask.save();
 
+    try {
+      if (client_id) {
+        await Notification.create({
+          user_id: client_id,
+          role: 'client',
+          message: `You have a new task: "${what}".`,
+        });
+      }
+
+      if (accountant_id) {
+        await Notification.create({
+          user_id: accountant_id,
+          role: 'accountant',
+          message: `A new task "${what}" was assigned.`,
+        });
+      }
+    } catch (notifErr) {
+      console.error('Erro ao criar notificação:', notifErr);
+    }
+
     return NextResponse.json({ message: 'Task created successfully!', task: newTask });
   } catch (err) {
     console.error('Error creating task:', err);
@@ -81,6 +102,7 @@ export async function POST(req: Request) {
     }, { status: 500 });
   }
 }
+
 
 
 // GET - Buscar tasks (pode filtrar por id via query param ?id=xxx)
@@ -187,3 +209,4 @@ export async function PUT(req: Request) {
     return NextResponse.json({ message: 'Internal error while updating task.' }, { status: 500 });
   }
 }
+
