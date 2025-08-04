@@ -13,7 +13,11 @@ type Task = {
   client_id: string;
 };
 
-export default function Allclients() {
+type Props = {
+  onNavigate: (screen: string) => void;
+};
+
+export default function Allclients({ onNavigate }: Props) {
   const [clients, setClients] = useState<Client[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [search, setSearch] = useState('');
@@ -64,9 +68,9 @@ export default function Allclients() {
           />
           <img src="/search.svg" alt="search" />
         </div>
-        <button className="add-client-bottom">
+        <button className="add-client-bottom" onClick={() => onNavigate('add-client')}>
           <img src="/plus.svg" alt="" />
-          <span>add client</span>
+          <span>add Client</span>
         </button>
       </div>
 
@@ -82,10 +86,25 @@ export default function Allclients() {
                   <p>{clientTasks.length} tasks open</p>
                 </div>
                 <div className="add-task-open-btn">
-                  <button>
-                      <img src="/plus.svg" alt="" />
-                      <span>add task</span>
+                  <button
+                    onClick={() => {
+                      localStorage.setItem("selectedClientId", client._id);
+                      onNavigate("add-tasks");
+                    }}
+                  >
+                    <img src="/plus.svg" alt="" />
+                    <span>add task</span>
                   </button>
+                  <button
+                    onClick={() => {
+                      localStorage.setItem("selectedClientId", client._id);
+                      onNavigate("add-client");
+                    }}
+                  >
+                    <img src="/plus.svg" alt="" />
+                    <span>edit client</span>
+                  </button>
+
                   <button>
                     <span>open</span>
                     <img src="/chevron.svg" alt="" />

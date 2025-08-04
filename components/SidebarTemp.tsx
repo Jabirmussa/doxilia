@@ -22,16 +22,16 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-      if (Notification.permission === "default") {
-        Notification.requestPermission().then(permission => {
-          if (permission === "granted") {
-            console.log("✅ Permissão de notificação concedida!");
-          } else {
-            console.log("❌ Permissão de notificação negada.");
-          }
-        });
-      }
-    }, [])
+    if (Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          console.log("✅ Permissão de notificação concedida!");
+        } else {
+          console.log("❌ Permissão de notificação negada.");
+        }
+      });
+    }
+  }, [])
   useEffect(() => {
     let lastCount = 0;
 

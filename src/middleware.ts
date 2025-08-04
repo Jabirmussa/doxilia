@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
     const { payload } = await jwtVerify(token, secret);
     
     const userRole = payload.role as string;
-    console.log('✅ Token válido. Role:', userRole);
+    // console.log('✅ Token válido. Role:', userRole);
 
     if (
     (pathname.startsWith('/admin') && userRole !== 'admin') ||

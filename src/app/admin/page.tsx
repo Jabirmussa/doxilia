@@ -33,14 +33,14 @@ const AdminDashboard = () => {
   const renderMainContent = () => {
     switch (activeScreen) {
       case 'dashboard':
-        return <Allclients />;
+        return <Allclients onNavigate={setActiveScreen} />;
       case 'add-client':
         return <AddClient />;
       case 'documents':
         return <AllFiles />;
       case 'all-clients':
       case 'clients':
-        return <Allclients />;
+        return <Allclients onNavigate={setActiveScreen} />;
       case 'account':
       case 'settings':
         return <Account />;

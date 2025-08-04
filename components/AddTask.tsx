@@ -38,16 +38,22 @@ export default function AddTask() {
   useEffect(() => {
     const accType = localStorage.getItem("role");
     const accId = localStorage.getItem("user_id");
+    const selectedClientId = localStorage.getItem("selectedClientId");
+
     setAccountType(accType || "");
     setAccountId(accId || "");
+
+    setFormData((prev) => ({
+      ...prev,
+      client_id: selectedClientId || "",
+      accountant_id: accType === "accountant" && accId ? accId : prev.accountant_id
+    }));
 
     if (accType === "admin") {
       fetch("/api/accountant")
         .then((res) => res.json())
         .then((data) => setAccountants(data))
         .catch((err) => console.error("Erro ao buscar accountants:", err));
-    } else if (accType === "accountant" && accId) {
-      setFormData((prev) => ({ ...prev, accountant_id: accId }));
     }
 
     fetch("/api/clients")
@@ -55,6 +61,7 @@ export default function AddTask() {
       .then((data) => setClients(data))
       .catch((err) => console.error("Erro ao buscar clientes:", err));
   }, []);
+
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -108,6 +115,7 @@ export default function AddTask() {
 
       toast.success("Tarefa criada com sucesso!");
 
+      localStorage.removeItem("selectedClientId");
       setFormData({
         status: "UPCOMING",
         client_id: "",
@@ -119,7 +127,6 @@ export default function AddTask() {
         who: "",
         payment_id: "",
       });
-
       setGuideFile(null);
       setUploadFile(null);
     } catch (err) {

@@ -46,7 +46,7 @@ const AccountantDashboard = () => {
       return <Account />;
       case 'all-clients':
       case 'clients':
-        return <Allclients />;
+        return <Allclients onNavigate={setActiveScreen} />
       case 'tasks':
       case 'all-tasks':
         return (
