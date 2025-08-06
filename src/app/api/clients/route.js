@@ -43,7 +43,7 @@ export async function POST(req) {
       });
     }
 
-    const newClient = await Client.create({ name, email, nuit, password, acc_id });
+    const newClient = await Client.create({ name, email, nuit, password, phone, acc_id });
 
     return new Response(JSON.stringify(newClient), {
       status: 201,

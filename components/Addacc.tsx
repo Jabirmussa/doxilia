@@ -34,15 +34,14 @@ export default function AddAccountant() {
 
       if (!res.ok) {
         if (data.message?.includes("E11000 duplicate key")) {
-          toast.error("Este e-mail já está associado a um contador.");
+          toast.error("This email is already associated with a counter.");
         } else {
-          toast.error(data.message || "Erro ao criar cliente.");
+          toast.error(data.message || "Error creating client.");
         }
         return;
       }
 
-      console.log("✅ Contador criado:", data);
-      toast.success("Contador criado com sucesso!");
+      toast.success("Counter created successfully!");
 
       setUsername("");
       setEmail("");
@@ -50,7 +49,7 @@ export default function AddAccountant() {
       setPassword("");
     } catch (err) {
       console.error("❌ Erro:", err);
-      toast.error("Erro ao criar cliente. Veja o console.");
+      toast.error("Error creating client. See console.");
     } finally {
       setLoading(false);
     }

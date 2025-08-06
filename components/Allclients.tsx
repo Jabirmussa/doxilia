@@ -9,6 +9,7 @@ type Client = {
 };
 
 type Task = {
+  status: string;
   _id: string;
   client_id: string;
 };
@@ -78,12 +79,18 @@ export default function Allclients({ onNavigate }: Props) {
         {clients
           .filter(client => client.name.toLowerCase().includes(search.toLowerCase()))
           .map(client => {
-            const clientTasks = tasks.filter(task => task.client_id === client._id);
+            const clientTasks = tasks.filter(
+              task => task.client_id === client._id && task.status === "OPEN"
+            );
+
             return (
               <div key={client._id} className="clients-list-item">
                 <div className="client-name-task">
                   <p>{client.name}</p>
-                  <p>{clientTasks.length} tasks open</p>
+                  <p>
+                    {clientTasks.length} {clientTasks.length === 1 ? "task" : "tasks"} open
+                  </p>
+
                 </div>
                 <div className="add-task-open-btn">
                   <button
@@ -97,18 +104,18 @@ export default function Allclients({ onNavigate }: Props) {
                   </button>
                   <button
                     onClick={() => {
-                      localStorage.setItem("selectedClientId", client._id);
+                      localStorage.setItem("editingClient", JSON.stringify(client));
                       onNavigate("add-client");
                     }}
                   >
-                    <img src="/plus.svg" alt="" />
-                    <span>edit client</span>
+                    <img src="/edit.svg" alt="" />
+                    {/* <span>edit client</span> */}
                   </button>
 
-                  <button>
+                  {/* <button>
                     <span>open</span>
                     <img src="/chevron.svg" alt="" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
             );

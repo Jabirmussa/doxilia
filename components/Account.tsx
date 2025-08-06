@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import styles from "@/components/addClient.module.css";
+import 'react-phone-input-2/lib/material.css';
+import PhoneInput from "react-phone-input-2";
 import toast from 'react-hot-toast';
 
 type UserType = 'client' | 'accountant' | 'admin';
@@ -12,6 +14,7 @@ type UserData = {
   language: string;
   email: string;
   password: string;
+  phone: string;
 };
 
 export default function Account() {
@@ -20,6 +23,7 @@ export default function Account() {
     name: '',
     language: 'English',
     email: '',
+    phone: '',
     password: '',
   });
 
@@ -59,6 +63,13 @@ export default function Account() {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
+  const handlePhoneChange = (value: string) => {
+  setUserData((prev) => ({
+    ...prev,
+    phone: value,
+  }));
+};
+
 
   const handleSave = async () => {
     const userId = localStorage.getItem('user_id');
@@ -89,23 +100,27 @@ export default function Account() {
       <h1 className={styles.title}>Account Settings</h1>
       <div className={styles.row}>
         <div className={styles.column}>
-          <label>NUIT</label>
-          <input
-            type="text"
-            value={userData.nuit}
-            className={styles.inputItem}
-            disabled
-          />
+          {userType !== 'admin' &&(
+            <>
+              <label>NUIT</label>
+              <input
+                type="text"
+                value={userData.nuit}
+                className={styles.inputItem}
+                disabled
+              />
 
-          <label>Company</label>
-          <input
-            type="text"
-            name="name"
-            value={userData.name}
-            onChange={handleChange}
-            className={styles.inputItem}
-            required
-          />
+              <label>Company</label>
+              <input
+                type="text"
+                name="name"
+                value={userData.name}
+                onChange={handleChange}
+                className={styles.inputItem}
+                required
+              />
+            </>
+          )}
 
           <label>Language</label>
           <select
@@ -130,6 +145,17 @@ export default function Account() {
             required
           />
 
+          <label>Phone Number</label>
+          <PhoneInput
+            country={'mz'}
+            value={userData.phone}
+            onChange={handlePhoneChange}
+            inputClass={styles.inputItem}
+            inputProps={{
+              name: 'phone',
+              required: true,
+            }}
+          />
           <label>Password</label>
           <input
             type="password"

@@ -1,31 +1,28 @@
 import { connectDB } from '@/lib/mongodb';
 import Accountant from '@/models/Accountant';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-// GET
-export async function GET(request: Request, context: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   await connectDB();
-  const { id } = context.params;
-  const accountant = await Accountant.findById(id);
-  if (!accountant) return new Response('Accountant not found', { status: 404 });
+  const accountant = await Accountant.findById(params.id);
+  if (!accountant) return new NextResponse('Accountant not found', { status: 404 });
   return NextResponse.json(accountant);
 }
 
-// PUT
-export async function PUT(req: Request, context: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   await connectDB();
-  const { id } = context.params;
   const data = await req.json();
-  const updated = await Accountant.findByIdAndUpdate(id, data, { new: true });
-  if (!updated) return new Response('Accountant not found', { status: 404 });
+  const updated = await Accountant.findByIdAndUpdate(params.id, data, { new: true });
+  if (!updated) return new NextResponse('Accountant not found', { status: 404 });
   return NextResponse.json(updated);
 }
 
-// DELETE
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   await connectDB();
-  const { id } = context.params;
-  const deleted = await Accountant.findByIdAndDelete(id);
-  if (!deleted) return new Response('Accountant not found', { status: 404 });
+  const deleted = await Accountant.findByIdAndDelete(params.id);
+  if (!deleted) return new NextResponse('Accountant not found', { status: 404 });
   return NextResponse.json({ message: 'Accountant deleted successfully' });
 }

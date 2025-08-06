@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import styles from "@/components/addClient.module.css";
 
@@ -22,6 +23,10 @@ export default function AddTask() {
   const [loading, setLoading] = useState(false);
   const [guideFile, setGuideFile] = useState<File | null>(null);
   const [uploadFile, setUploadFile] = useState<File | null>(null); 
+  const dueDateInputRef = useRef<HTMLInputElement>(null);
+  const periodInputRef = useRef<HTMLInputElement>(null);
+
+
 
   const [formData, setFormData] = useState({
     status: "UPCOMING",
@@ -111,9 +116,9 @@ export default function AddTask() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Erro ao criar tarefa.");
+      if (!res.ok) throw new Error(result.message || "Error creating task.");
 
-      toast.success("Tarefa criada com sucesso!");
+      toast.success("Task created successfully!");
 
       localStorage.removeItem("selectedClientId");
       setFormData({
@@ -133,8 +138,8 @@ export default function AddTask() {
       const errorMessage =
         err && typeof err === "object" && "message" in err
           ? (err as { message?: string }).message
-          : "Erro ao criar tarefa.";
-      toast.error(errorMessage ?? "Erro ao criar tarefa.");
+          : "Error creating task.";
+      toast.error(errorMessage ?? "Error creating task.");
     } finally {
       setLoading(false);
     }
@@ -188,14 +193,25 @@ export default function AddTask() {
           />
 
           <label>Due Date</label>
-          <input
-            type="date"
-            name="due_date"
-            value={formData.due_date}
-            onChange={handleChange}
-            className={styles.inputItem}
-            required
-          />
+          <div className={styles.dateWrapper}>
+            <input
+              type="date"
+              name="due_date"
+              value={formData.due_date}
+              onChange={handleChange}
+              className={styles.inputItem}
+              required
+              ref={dueDateInputRef}
+            />
+            <img
+              src="/calendar.png"
+              alt="Calendar"
+              className={styles.calendarIcon}
+              onClick={() => dueDateInputRef.current?.showPicker?.() || dueDateInputRef.current?.focus()}
+            />
+
+          </div>
+
 
           <label>Payment ID</label>
           <input
@@ -210,15 +226,23 @@ export default function AddTask() {
 
         <div className={styles.column}>
           <label>Period</label>
-          <input
-            type="date"
-            name="period"
-            value={formData.period}
-            onChange={handleChange}
-            className={styles.inputItem}
-            required
-          />
-
+          <div className={styles.dateWrapper}>
+            <input
+              type="month"
+              name="period"
+              value={formData.period}
+              onChange={handleChange}
+              className={styles.inputItem}
+              required
+              ref={periodInputRef}
+            />
+            <img
+              src="/calendar.png"
+              alt="Calendar"
+              className={styles.calendarIcon}
+              onClick={() => periodInputRef.current?.showPicker?.() || periodInputRef.current?.focus()}
+            />
+          </div>
           <label>Who</label>
           <input
             type="text"

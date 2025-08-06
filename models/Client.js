@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import mongoose, { Schema, model, models } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { type } from 'os';
 
 const clientSchema = new Schema({
   name: {
@@ -22,6 +23,10 @@ const clientSchema = new Schema({
   nuit: {
     type: String,
     required: true,
+    trim: true,
+  },
+  phone: {
+    type: String,
     trim: true,
   },
   acc_id: {

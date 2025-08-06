@@ -6,7 +6,15 @@
     "no-inline-styles": "off",
     "axe/forms": "off",
     "button-type": "off",
-    "axe/text-alternatives": "off"
+    "axe/text-alternatives": "off",
+    "compat-api/html": [
+      "default",
+      {
+        "ignore": [
+          "input[type=month]"
+        ]
+      }
+    ]
   },
   "browserslist": [
     "defaults",

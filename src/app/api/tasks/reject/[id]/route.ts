@@ -3,10 +3,17 @@ import Task from "@/models/Task";
 import Notification from "@/models/Notification";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+type ContextType = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PUT(req: NextRequest, context: ContextType) {
   await connectDB();
 
   try {
+    const params = await context.params; // await aqui, porque é Promise
     const { reason } = await req.json();
 
     const updatedTask = await Task.findByIdAndUpdate(

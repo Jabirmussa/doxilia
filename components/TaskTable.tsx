@@ -162,6 +162,25 @@
       const file = e.target.files?.[0];
       if (!file) return;
 
+      const task = tasks.find((t) => t._id === taskId);
+      if (!task) return;
+
+      // Se task foi rejeitada e tem upload anterior
+      if (task.status === "OPEN" && task.upload && task.description) {
+        try {
+          await fetch(`/api/tasks/upload/${taskId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ fileUrl: task.upload }),
+          });
+          console.log("Upload antigo deletado com sucesso.");
+        } catch (err) {
+          console.error("Erro ao deletar o upload antigo", err);
+        }
+      }
+
       const formData = new FormData();
       formData.append("file", file);
 
@@ -176,32 +195,28 @@
         const data = await res.json();
         toast.success("Arquivo enviado com sucesso!");
 
-        // Atualiza o upload na task
+        // Atualiza a task no front: novo upload e limpa a descrição
         setTasks((prevTasks) =>
           prevTasks.map((t) =>
-            t._id === taskId ? { ...t, upload: data.uploadLink } : t
+            t._id === taskId ? { ...t, upload: data.uploadLink, status: "OPEN", description: "" } : t
           )
         );
 
-        //Atualiza o status da task para "OPEN"
+        // Atualiza no banco: status OPEN e limpa descrição
         await fetch(`/api/tasks/status/${taskId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status: "OPEN" }),
+          body: JSON.stringify({ status: "OPEN", description: "" }),
         });
 
-        setTasks((prevTasks) =>
-          prevTasks.map((t) =>
-            t._id === taskId ? { ...t, status: "OPEN" } : t
-          )
-        );
       } catch (err) {
         toast.error("Erro ao fazer upload");
         console.error(err);
       }
     };
+
 
    const handleGuideUpload = async (
       e: React.ChangeEvent<HTMLInputElement>,
@@ -353,7 +368,21 @@
           <span>Action</span>
         </div>
 
-        {tasks.map((task, idx) => (
+        {[...tasks]
+        .sort((a, b) => {
+          const isAClosed = a.status.toLowerCase() === "close";
+          const isBClosed = b.status.toLowerCase() === "close";
+
+          if (isAClosed && isBClosed) {
+            return b._id.localeCompare(a._id);
+          }
+
+          if (isAClosed) return 1;
+
+          if (isBClosed) return -1;
+
+          return b._id.localeCompare(a._id);
+        }).map((task, idx) => (
           <div className="task-items" key={idx}>
           <div key={idx} onClick={() => handleToggle(idx)}  className="task-item">
             <div className="task-row">
@@ -384,7 +413,7 @@
                 </span>
               </span>
               {role !== 'client'&&(
-                <span>{clientNames[task.client_id ?? ""] ?? "Carregando..."}</span>
+                <span>{clientNames[task.client_id ?? ""] ?? "Loading..."}</span>
               )}
               <span><TaskDate dateString={task.due_date} /></span>
               <span>{task.what}</span>

@@ -1,11 +1,12 @@
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   await connectDB();
 
   try {
+    const params = await context.params; 
     const deleted = await Task.findByIdAndDelete(params.id);
 
     if (!deleted) {

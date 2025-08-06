@@ -1,9 +1,10 @@
 import { connectDB } from '@/lib/mongodb';
 import Admin from '@/models/Admin';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // GET
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   await connectDB();
   const admin = await Admin.findById(params.id);
   if (!admin) return new Response('Admin not found', { status: 404 });
@@ -11,7 +12,8 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 }
 
 // PUT
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   await connectDB();
   const data = await req.json();
   const updated = await Admin.findByIdAndUpdate(params.id, data, { new: true });
@@ -20,7 +22,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 // DELETE
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
   await connectDB();
   const deleted = await Admin.findByIdAndDelete(params.id);
   if (!deleted) return new Response('Admin not found', { status: 404 });

@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import styles from "@/components/addClient.module.css";
+import 'react-phone-input-2/lib/material.css';
 import toast from "react-hot-toast";
+import PhoneInput from "react-phone-input-2";
 
 interface Accountant {
   _id: string;
@@ -14,17 +16,34 @@ export default function AddClient() {
   const [email, setEmail] = useState("");
   const [nuit, setNuit] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [accId, setAccId] = useState("");
   const [role, setRole] = useState("");
   const [accountants, setAccountants] = useState<Accountant[]>([]);
   const [loading, setLoading] = useState(false);
-  
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingClientId, setEditingClientId] = useState<string | null>(null);
+
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
     const storedAccId = localStorage.getItem("acc_id");
+    const editingClientRaw = localStorage.getItem("editingClient");
 
     if (storedRole) setRole(storedRole);
     if (storedAccId) setAccId(storedAccId);
+
+    // Preencher campos se estiver editando
+    if (editingClientRaw) {
+      const client = JSON.parse(editingClientRaw);
+      setUsername(client.name || "");
+      setEmail(client.email || "");
+      setNuit(client.nuit || "");
+      setPhone(client.phone || "");
+      setPassword("");
+      if (client.accountant_id) setAccId(client.accountant_id);
+      setIsEditMode(true);
+      setEditingClientId(client._id || null);
+    }
 
     if (storedRole === "admin") {
       fetch("/api/accountant")
@@ -38,38 +57,52 @@ export default function AddClient() {
     e.preventDefault();
     setLoading(true);
 
+    const payload = {
+      name,
+      email,
+      nuit,
+      phone,
+      password,
+      ...(role === "admin" && { acc_id: accId }),
+    };
+
     try {
-      const res = await fetch("/api/clients", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          nuit,
-          password,
-          ...(role === "admin" && { acc_id: accId }),
-        }),
-      });
+      const res = await fetch(
+        isEditMode
+          ? `/api/clients/${editingClientId}`
+          : "/api/clients",
+        {
+          method: isEditMode ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.message || "Erro ao criar cliente.");
+        toast.error(data.message || "Error saving client.");
         return;
       }
 
-      toast.success("Cliente criado com sucesso!");
+      toast.success(
+        isEditMode ? "Client updated successfully!" : "Client created successfully!"
+      );
 
       setUsername("");
       setEmail("");
       setNuit("");
       setPassword("");
+      setPhone("");
       if (role === "admin") setAccId("");
+      localStorage.removeItem("editingClient");
+      setIsEditMode(false);
+      setEditingClientId(null);
     } catch (err) {
       console.error("❌ Erro:", err);
-      toast.error("Erro ao criar cliente. Veja o console.");
+      toast.error("Error saving client. See console.");
     } finally {
       setLoading(false);
     }
@@ -77,8 +110,10 @@ export default function AddClient() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h2 className={styles.title}>Add Client</h2>
-      
+      <h2 className={styles.title}>
+        {isEditMode ? "Edit Client" : "Add Client"}
+      </h2>
+
       <div className={styles.row}>
         <div className={styles.column}>
           <label>Username</label>
@@ -98,6 +133,18 @@ export default function AddClient() {
             placeholder="123456789"
             required
           />
+
+          <label>Phone Number</label>
+          <PhoneInput
+            country={'mz'}
+            value={phone}
+            onChange={setPhone}
+            inputClass={styles.inputItem}
+            inputProps={{
+              name: 'phone',
+              required: true,
+            }}
+          />
         </div>
 
         <div className={styles.column}>
@@ -116,26 +163,26 @@ export default function AddClient() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Client Password"
-            required
+            required={!isEditMode}
           />
-          {role === "admin" && (
-        <div className={styles.column}>
-          <label>Accountant</label>
-          <select
-            value={accId}
-            onChange={(e) => setAccId(e.target.value)}
-            required
-          >
-            <option value="">Select Accountant</option>
-            {accountants.map((acc) => (
-              <option key={acc._id} value={acc._id}>
-                {acc.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
 
+          {role === "admin" && (
+            <div className={styles.column}>
+              <label>Accountant</label>
+              <select
+                value={accId}
+                onChange={(e) => setAccId(e.target.value)}
+                required
+              >
+                <option value="">Select Accountant</option>
+                {accountants.map((acc) => (
+                  <option key={acc._id} value={acc._id}>
+                    {acc.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
@@ -144,7 +191,7 @@ export default function AddClient() {
           <span className={styles.loader}></span>
         ) : (
           <>
-            <span>ADD NOW</span>
+            <span>{isEditMode ? "UPDATE CLIENT" : "ADD NOW"}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"

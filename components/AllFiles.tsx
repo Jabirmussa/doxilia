@@ -9,7 +9,10 @@ type Task = {
   accountant_id: string;
   upload?: string;
   guide?: string;
+  who: string;
+  period: string;
 };
+
 
 export default function AllFiles() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -94,7 +97,9 @@ export default function AllFiles() {
                 return (
                   <div className="file-item" key={type}>
                     <a href={file} target="_blank" rel="noreferrer">
-                      {file.split("/").pop()?.split("_")[0]}
+                      {type === "guide"
+                        ? `Guia_${task.who}_${task.period}`
+                        : `Comprovativo_${task.who}_${task.period}`}
                     </a>
 
                     <span>{file.split(".").pop()?.toUpperCase()}</span>

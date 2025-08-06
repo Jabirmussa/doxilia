@@ -90,3 +90,20 @@
   resize: vertical; 
   min-height: 100px;
 }
+
+.dateWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.dateWrapper input{
+  width: 100%;
+}
+.calendarIcon {
+  position: absolute;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  mix-blend-mode: difference;
+}

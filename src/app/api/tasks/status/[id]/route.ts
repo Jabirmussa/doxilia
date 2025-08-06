@@ -3,29 +3,41 @@ import Task from '@/models/Task';
 import Notification from '@/models/Notification';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+type Context = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export async function PUT(req: NextRequest, context: Context) {
   await connectDB();
 
   try {
-    const { id } = context.params;
-    const { status } = await req.json();
+    const params = await context.params;  // await aqui
+    const { id } = params;
+    const { status, description } = await req.json();
 
     if (!status) {
       return NextResponse.json({ error: "Missing status" }, { status: 400 });
     }
 
-    const updated = await Task.findByIdAndUpdate(id, { status }, { new: true });
+    const updateFields: Record<string, unknown> = { status };
+    if (description !== undefined) {
+      updateFields.description = description;
+    }
+
+    const updated = await Task.findByIdAndUpdate(id, updateFields, { new: true });
 
     if (!updated) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
 
-    let message = "";
-    if (status === "CHECKING") {
+    let message = '';
+    if (status === 'CHECKING') {
       message = `Document sent for task "${updated.what}" is being verified.`;
-    } else if (status === "CLOSE") {
+    } else if (status === 'CLOSE') {
       message = `Document for task "${updated.what}" has been approved and task is now closed.`;
-    } else if (status === "OPEN") {
+    } else if (status === 'OPEN') {
       message = `Task "${updated.what}" reopened. Please reupload the file.`;
     }
 
@@ -33,13 +45,13 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
       await Notification.create({
         user_id: updated.client_id,
         message,
-        role: "client",
+        role: 'client',
       });
     }
 
-    return NextResponse.json({ message: "Status updated successfully!" });
+    return NextResponse.json({ message: 'Status updated successfully!' });
   } catch (err) {
-    console.error("Error updating status", err);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    console.error('Error updating status:', err);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

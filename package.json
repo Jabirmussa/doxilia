@@ -20,7 +20,8 @@
     "next": "15.4.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-hot-toast": "^2.5.2"
+    "react-hot-toast": "^2.5.2",
+    "react-phone-input-2": "^2.15.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
