@@ -159,7 +159,11 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   return (
     <aside className="sidebar">
       <div className="logo-sidebar">
-        <img src="/logo.png" alt="logo" />
+        {menuOpen ? (
+          <img src="/favicon.png" alt="favicon" />
+        ) : (
+            <img src="/logo.png" alt="logo" />
+          )}
       </div>
       <div className={`humburguer-menu ${menuOpen ? "active" : ""}`} onClick={toggleMenu}>
         <span></span>
@@ -187,16 +191,22 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
               className="menu-link"
             >
               <img src={link.img} alt="menu-icon" />
-              <div className="link-title">
-                <span>{link.label}</span>
-                {(link.label === "Tasks" || link.label === "Documents" || link.label === "Dashboard") &&
-                  notificationCount > 0 &&
-                  !viewedSections.includes(link.label) && (
-                    <div className="notification">
-                      <span>{notificationCount}</span>
-                    </div>
-                  )}
-              </div>
+
+                <div className="link-title">
+                  <span>{link.label}</span>
+
+                  {(link.label === "Tasks" ||
+                    link.label === "Documents" ||
+                    link.label === "Dashboard") &&
+                    notificationCount > 0 &&
+                    !viewedSections.includes(link.label) && (
+                      <div className="notification">
+                        <span>{notificationCount}</span>
+                      </div>
+                    )}
+                </div>
+              {/* {!menuOpen && (
+              )} */}
             </button>
 
             {hovered === link.label && link.submenu && (
@@ -227,12 +237,14 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
         >
           <img src="/arrow-left-circle.png" alt="icon" />
           <span>Close menu</span>
+          {/* {!menuOpen && <span>Close menu</span>} */}
         </Link>
 
       </nav>
       <button className="menu-btn">
         <img src="/whatsapp.png" alt="icon" />
         <span>Whatsapp-nos</span>
+        {/* {!menuOpen && <span>Whatsapp-nos</span>}  */}
       </button>
     </aside>
   );

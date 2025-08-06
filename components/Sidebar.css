@@ -82,6 +82,7 @@
     z-index: 0;
     border-radius: 5px;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.3s ease-in-out;
   }
   &:hover::after{
@@ -177,7 +178,9 @@
     }
   }
 }
-
+.menu-close img{
+  transition: all 0.3s ease-in-out;
+}
 @media (min-width: 48rem) {
   body.menu-is-open{
     .sidebar span{
@@ -189,6 +192,9 @@
       .menu-link-wrapper::after{
         left: -10px;
         width: calc(100% + 40px);
+      }
+      .menu-close img{
+          transform: rotate(180deg);
       }
     }
     .submenu{
