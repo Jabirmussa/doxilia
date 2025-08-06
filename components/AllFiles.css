@@ -23,7 +23,7 @@
         background-color: #fff;
         padding: 22px 30px;
         display: flex;
-        flex-direction: column;
+        flex-wrap: wrap;
         justify-content: space-between;
         border-radius: 10px;
         gap: 20px;
