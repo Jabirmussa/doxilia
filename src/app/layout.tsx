@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Doxilia",
   description: "Doxilia app",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
