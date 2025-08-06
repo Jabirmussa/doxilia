@@ -5,6 +5,7 @@
   grid-column: 1 / span 9;
   max-height: 100%;
   overflow-y: auto;
+  margin-right: 10px;
    @media screen and (min-width: 48rem) { 
      max-height: 600px;
   }

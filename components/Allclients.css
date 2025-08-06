@@ -95,6 +95,7 @@ button{
   overflow-y: auto;
   max-height: 550px;
   padding-right: 5px;
+  margin-right: 10px;
    @media screen and (min-width: 48rem) { 
      max-height: 420px;
   }
