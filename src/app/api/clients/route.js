@@ -5,9 +5,9 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || '6880cc252d82d03f0907a642';
 
-// Pega dados do token do cookie
+
 async function getUserFromToken() {
-  const cookieStore = await cookies(); // AGORA com await
+  const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
   if (!token) throw new Error('Token não encontrado');
@@ -43,7 +43,7 @@ export async function POST(req) {
       });
     }
 
-    const newClient = await Client.create({ name, email, nuit, password, phone, acc_id });
+    const newClient = await Client.create({ name, email, nuit, password, phone, acc_id, language });
 
     return new Response(JSON.stringify(newClient), {
       status: 201,

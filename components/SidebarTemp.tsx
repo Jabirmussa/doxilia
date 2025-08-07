@@ -31,8 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
         }
       });
     }
-  }, [])
-  useEffect(() => {
+
     let lastCount = 0;
 
     const fetchNotifications = async () => {
@@ -62,8 +61,10 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
 
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 10000);
+
     return () => clearInterval(interval);
   }, []);
+
 
   useEffect(() => {
     document.body.classList.toggle("menu-is-open", menuOpen);

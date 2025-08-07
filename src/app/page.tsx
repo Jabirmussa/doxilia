@@ -39,6 +39,9 @@ export default function Index() {
       toast.success('Login successful!');
 
       localStorage.setItem('role', data.userType);
+      
+      localStorage.setItem("language", data.language);
+
 
       if (data.acc_id) {
         localStorage.setItem('acc_id', data.acc_id);

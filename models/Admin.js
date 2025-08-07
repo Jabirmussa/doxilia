@@ -19,6 +19,11 @@ const adminSchema = new Schema({
     type: String,
     required: true,
   },
+  language: {
+    type: String,
+    enum: ['English', 'Portuguese'],
+    default: 'English'
+  },
   role: {
     type: String,
     default: 'admin',

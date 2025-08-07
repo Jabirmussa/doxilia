@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import styles from "@/components/addClient.module.css";
 import 'react-phone-input-2/lib/material.css';
 import PhoneInput from "react-phone-input-2";
+import { useLanguage } from '@/src/app/contexts/LanguageContext';
+
 import toast from 'react-hot-toast';
 
 type UserType = 'client' | 'accountant' | 'admin';
@@ -18,17 +20,19 @@ type UserData = {
 };
 
 export default function Account() {
+  
   const [userData, setUserData] = useState<UserData>({
     nuit: '',
     name: '',
-    language: 'English',
+    language: '',
     email: '',
     phone: '',
     password: '',
   });
-
+  
   const [loading, setLoading] = useState(true);
   const [userType, setUserType] = useState<UserType>('client');
+  const { setLanguage } = useLanguage();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,22 +65,29 @@ export default function Account() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
+    if (name === 'language') {
+      setLanguage(value as 'English' | 'Portuguese');
+    }
+
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
-  const handlePhoneChange = (value: string) => {
-  setUserData((prev) => ({
-    ...prev,
-    phone: value,
-  }));
-};
 
+  const handlePhoneChange = (value: string) => {
+    setUserData((prev) => ({
+      ...prev,
+      phone: value,
+    }));
+  };
 
   const handleSave = async () => {
     const userId = localStorage.getItem('user_id');
+    const rawRole = localStorage.getItem('role') as UserType;
+      const role = rawRole === 'client' ? 'clients' : rawRole;
     if (!userId) return;
 
     try {
-      const res = await fetch(`/api/${userType}s/${userId}`, {
+      const res = await fetch(`/api/${role}/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),

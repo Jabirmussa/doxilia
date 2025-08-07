@@ -19,6 +19,11 @@ const accountantSchema = new Schema({
     type: String,
     required: true,
   },
+  language: {
+    type: String,
+    enum: ['English', 'Portuguese'],
+    default: 'English'
+  },
   nuit: {
     type: String,
     required: true,
