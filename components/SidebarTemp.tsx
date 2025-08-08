@@ -1,7 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from 'next/link';
-import React, { useState , useEffect} from 'react';
+import FeatherIcon from '@/components/FeatherIcon';
+import { useLanguage } from "@/src/app/contexts/LanguageContext";
+import { dictionaries } from "@/src/app/contexts/dictionaries";
+import React, { useState , useEffect, ReactElement } from 'react';
 
 interface SidebarProps {
   role: 'admin' | 'client' | 'accountant';
@@ -11,11 +14,13 @@ interface SidebarProps {
 interface LinkItem {
   label: string;
   screen: string;
-  img: string;
+  icon?: ReactElement;
   submenu?: string[];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
+  const { language } = useLanguage();
+  const t = (key: string) => dictionaries[language]?.[key] || key;
   const [hovered, setHovered] = useState<string | null>(null);
   const [notificationCount, setNotificationCount] = useState<number>(0);
   const [viewedSections, setViewedSections] = useState<string[]>([]);
@@ -102,35 +107,40 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   };
 
 
-  const commonLinks: LinkItem[] = [
-    { label: 'Dashboard', screen: 'dashboard', img: '/bell.png' },
-    { label: 'Documents', screen: 'documents', img: '/columns.png' },
+ const commonLinks: LinkItem[] = [
+    { label: t('Dashboard'), screen: 'dashboard', icon: <FeatherIcon name="bell" className="icon-svg" /> },
     { 
-      label: 'Account', 
-      screen: 'account', 
-      img: '/user.png',
-      submenu: ['Settings', 'Logout'],
+      label: t('Documents'), 
+      screen: 'documents', 
+      icon: <FeatherIcon name="columns" className="icon-svg" />,
+      submenu: [t('All documents'), t('Add document')],
+    },
+    {
+      label: t('Account'),
+      screen: 'account',
+      icon: <FeatherIcon name="user" className="icon-svg" />,
+      submenu: [t('Settings'), t('Logout')],
     },
   ];
 
   const adminLinks: LinkItem[] = [
     {
-      label: 'Clients',
+      label: t('Clients'),
       screen: 'clients',
-      img: '/user.png',
-      submenu: ['All clients', 'Add client'],
+      icon: <FeatherIcon name="users" className="icon-svg" />,
+      submenu: [t('All clients'), t('Add client')],
     },
     {
-      label: 'Accountants',
+      label: t('Accountants'),
       screen: 'accountants',
-      img: '/columns.png',
-      submenu: ['All accountants', 'Add accountant'],
+      icon: <FeatherIcon name="briefcase" className="icon-svg" />,
+      submenu: [t('All accountants'), t('Add accountant')],
     },
     {
-      label: 'Tasks',
+      label: t('Tasks'),
       screen: 'tasks',
-      img: '/calendar.png',
-      submenu: ['All tasks', 'Add tasks'],
+      icon: <FeatherIcon name="calendar" className="icon-svg" />,
+      submenu: [t('All tasks'), t('Add tasks')],
     },
   ];
 
@@ -138,16 +148,16 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
   ];
 
   const accountantLinks: LinkItem[] = [
-    {
-      label: 'Clients',
+     {
+      label: t('Clients'),
       screen: 'clients',
-      img: '/user.png',
+      icon: <FeatherIcon name="users" className="icon-svg" />,
       submenu: ['All clients', 'Add client'],
     },
     {
-      label: 'Tasks',
+      label: t('Tasks'),
       screen: 'tasks',
-      img: '/calendar.png',
+      icon: <FeatherIcon name="calendar" className="icon-svg" />,
       submenu: ['All tasks', 'Add tasks'],
     },
   ];
@@ -191,21 +201,25 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
               onClick={() => handleLinkClick(link.screen, link.label)}
               className="menu-link"
             >
-              <img src={link.img} alt="menu-icon" />
+              {link.icon && (
+                <>
+                  <div className="icon">{link.icon}</div>
+                  <div className="link-title">
+                    <span>{link.label}</span>
 
-                <div className="link-title">
-                  <span>{link.label}</span>
+                    {(link.label === "Tasks" ||
+                      link.label === "Documents" ||
+                      link.label === "Dashboard") &&
+                      notificationCount > 0 &&
+                      !viewedSections.includes(link.label) && (
+                        <div className="notification">
+                          <span>{notificationCount}</span>
+                        </div>
+                      )}
+                  </div>
+                </>
+              )}
 
-                  {(link.label === "Tasks" ||
-                    link.label === "Documents" ||
-                    link.label === "Dashboard") &&
-                    notificationCount > 0 &&
-                    !viewedSections.includes(link.label) && (
-                      <div className="notification">
-                        <span>{notificationCount}</span>
-                      </div>
-                    )}
-                </div>
               {/* {!menuOpen && (
               )} */}
             </button>
@@ -236,8 +250,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role, onSelect }) => {
             toggleMenu();
           }}
         >
-          <img src="/arrow-left-circle.png" alt="icon" />
-          <span>Close menu</span>
+          <FeatherIcon name="arrow-left-circle" className="icon-svg" />
+          <span>{t('closeMenu')}</span>
           {/* {!menuOpen && <span>Close menu</span>} */}
         </Link>
 

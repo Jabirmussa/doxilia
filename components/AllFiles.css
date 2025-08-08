@@ -96,6 +96,34 @@
   cursor: pointer;
 }
 
+.upload-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+  .upload-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green-bg);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    margin-left: 10px;
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
 
 /* Estilo do scroll - Webkit (Chrome, Edge, Safari) */
 .files-items::-webkit-scrollbar {

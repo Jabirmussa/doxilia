@@ -143,3 +143,39 @@ li{
   align-self: center;
   color: var(--red-bg);
 }
+
+.upload-screen {
+  position: absolute;
+  z-index: 1001;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background-color: var(--blue-bg);
+  color: #fff;
+  .rectangle img{
+    width: calc(100% - 60px);
+    height: calc(100% - 60px);
+    position: absolute;
+    top: 30px;
+    left: 30px;
+  }
+  .upload-content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+    p{
+      font-size: 30px;
+    }
+    span svg{
+      width: 34px;
+      height: 34px;
+    }
+  }
+}

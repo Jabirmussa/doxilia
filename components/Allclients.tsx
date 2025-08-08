@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 import { useEffect, useState } from 'react';
+import { useLanguage } from "@/src/app/contexts/LanguageContext";
+import { dictionaries } from "@/src/app/contexts/dictionaries";
 import "./Allclients.css";
 
 type Client = {
@@ -19,6 +21,8 @@ type Props = {
 };
 
 export default function Allclients({ onNavigate }: Props) {
+  const { language } = useLanguage();
+  const t = (key: string) => dictionaries[language]?.[key] || key;
   const [clients, setClients] = useState<Client[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [search, setSearch] = useState('');
@@ -59,11 +63,11 @@ export default function Allclients({ onNavigate }: Props) {
   return (
     <div className="all-clients">
       <div className="client-list-header">
-        <h1>All clients</h1>
+        <h1>{t("allClients")}</h1>
         <div className="search-client">
-          <input 
-            type="text" 
-            placeholder="Search in clients" 
+          <input
+            type="text"
+            placeholder={t("searchInClients")}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -71,7 +75,7 @@ export default function Allclients({ onNavigate }: Props) {
         </div>
         <button className="add-client-bottom" onClick={() => onNavigate('add-client')}>
           <img src="/plus.svg" alt="" />
-          <span>add Client</span>
+          <span>{t("addClient")}</span>
         </button>
       </div>
 
@@ -100,7 +104,7 @@ export default function Allclients({ onNavigate }: Props) {
                     }}
                   >
                     <img src="/plus.svg" alt="" />
-                    <span>add task</span>
+                    <span>{t("addTask")}</span>
                   </button>
                   <button
                     onClick={() => {

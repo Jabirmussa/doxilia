@@ -1,8 +1,11 @@
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useLanguage } from "@/src/app/contexts/LanguageContext";
+import { dictionaries } from "@/src/app/contexts/dictionaries";
 import toast from "react-hot-toast";
+import FeatherIcon from '@/components/FeatherIcon';
 import styles from "@/components/addClient.module.css";
 
 interface Client {
@@ -16,6 +19,8 @@ interface Accountant {
 }
 
 export default function AddTask() {
+  const { language } = useLanguage();
+  const t = (key: string) => dictionaries[language]?.[key] || key
   const [accountType, setAccountType] = useState("");
   const [accountId, setAccountId] = useState("");
   const [clients, setClients] = useState<Client[]>([]);
@@ -147,11 +152,11 @@ export default function AddTask() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h2 className={styles.title}>Add/Edit Task</h2>
+      <h2 className={styles.title}>{t("addTask")}</h2>
 
       <div className={styles.row}>
         <div className={styles.column}>
-          <label>Status</label>
+          <label>{t("status")}</label>
           <select
             name="status"
             value={formData.status}
@@ -166,7 +171,7 @@ export default function AddTask() {
             <option value="OPEN">CLOSE</option>
           </select>
 
-          <label>Client</label>
+          <label>{t("client")}</label>
           <select
             name="client_id"
             value={formData.client_id}
@@ -174,7 +179,7 @@ export default function AddTask() {
             className={styles.inputItem}
             required
           >
-            <option value="">Select Client</option>
+            <option value="">{t("selectClient")}</option>
             {clients.map((client) => (
               <option key={client._id} value={client._id}>
                 {client.name}
@@ -182,7 +187,7 @@ export default function AddTask() {
             ))}
           </select>
 
-          <label>Amount</label>
+          <label>{t("amount")}</label>
           <input
             type="number"
             name="amount"
@@ -192,7 +197,7 @@ export default function AddTask() {
             required
           />
 
-          <label>Due Date</label>
+          <label>{t("dueDate")}</label>
           <div className={styles.dateWrapper}>
             <input
               type="date"
@@ -203,17 +208,29 @@ export default function AddTask() {
               required
               ref={dueDateInputRef}
             />
-            <img
-              src="/calendar.png"
-              alt="Calendar"
+            <span
               className={styles.calendarIcon}
               onClick={() => dueDateInputRef.current?.showPicker?.() || dueDateInputRef.current?.focus()}
-            />
+              style={{ cursor: "pointer" }}
+              tabIndex={0}
+              role="button"
+              aria-label="Open calendar"
+              onKeyPress={e => {
+                if (e.key === "Enter" || e.key === " ") {
+                  dueDateInputRef.current?.showPicker?.() || dueDateInputRef.current?.focus();
+                }
+              }}
+            >
+              <FeatherIcon
+                name="calendar"
+                className={styles.calendarIcon}
+              />
+            </span>
 
           </div>
 
 
-          <label>Payment ID</label>
+          <label>{t("paymentId")}</label>
           <input
             type="text"
             name="payment_id"
@@ -225,7 +242,7 @@ export default function AddTask() {
         </div>
 
         <div className={styles.column}>
-          <label>Period</label>
+          <label>{t("period")}</label>
           <div className={styles.dateWrapper}>
             <input
               type="month"
@@ -236,14 +253,27 @@ export default function AddTask() {
               required
               ref={periodInputRef}
             />
-            <img
-              src="/calendar.png"
-              alt="Calendar"
+            <span
               className={styles.calendarIcon}
               onClick={() => periodInputRef.current?.showPicker?.() || periodInputRef.current?.focus()}
-            />
+              style={{ cursor: "pointer" }}
+              tabIndex={0}
+              role="button"
+              aria-label="Open calendar"
+              onKeyPress={e => {
+                if (e.key === "Enter" || e.key === " ") {
+                  periodInputRef.current?.showPicker?.() || periodInputRef.current?.focus();
+                }
+              }}
+            >
+              <FeatherIcon
+                name="calendar"
+                className={styles.calendarIcon}
+              />
+            </span>
+
           </div>
-          <label>Who</label>
+          <label>{t("who")}</label>
           <input
             type="text"
             name="who"
@@ -253,7 +283,7 @@ export default function AddTask() {
             required
           />
 
-          <label>What</label>
+          <label>{t("what")}</label>
           <input
             type="text"
             name="what"
@@ -263,7 +293,7 @@ export default function AddTask() {
             required
           />
 
-          <label>Guide (PDF if have)</label>
+          <label>{t("guide")} (PDF)</label>
           <input
             type="file"
             name="guide"
@@ -274,7 +304,7 @@ export default function AddTask() {
 
           {accountType === "admin" && (
             <>
-              <label>Accountant</label>
+              <label>{t("Accountant")}</label>
               <select
                 name="accountant_id"
                 value={formData.accountant_id}
@@ -282,7 +312,7 @@ export default function AddTask() {
                 className={styles.inputItem}
                 required
               >
-                <option value="">Selecione o Contabilista</option>
+                <option value="">{t("selectAccountant")}</option>
                 {accountants.map((acc) => (
                   <option key={acc._id} value={acc._id}>
                     {acc.name}

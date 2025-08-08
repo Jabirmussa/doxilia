@@ -28,7 +28,7 @@ const clientSchema = new Schema({
   language: {
     type: String,
     enum: ['English', 'Portuguese'],
-    default: 'English'
+    default: 'Portuguese'
   },
   phone: {
     type: String,

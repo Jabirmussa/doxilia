@@ -17,6 +17,7 @@ export default function AddClient() {
   const [nuit, setNuit] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [language, setLanguage] = useState("");
   const [accId, setAccId] = useState("");
   const [role, setRole] = useState("");
   const [accountants, setAccountants] = useState<Accountant[]>([]);
@@ -39,6 +40,7 @@ export default function AddClient() {
       setEmail(client.email || "");
       setNuit(client.nuit || "");
       setPhone(client.phone || "");
+      setLanguage(client.language)
       setPassword("");
       if (client.accountant_id) setAccId(client.accountant_id);
       setIsEditMode(true);
@@ -63,6 +65,7 @@ export default function AddClient() {
       nuit,
       phone,
       password,
+      language,
       ...(role === "admin" && { acc_id: accId }),
     };
 
@@ -165,6 +168,15 @@ export default function AddClient() {
             placeholder="Client Password"
             required={!isEditMode}
           />
+          <label>Language</label>
+          <select
+            name="language"
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+          >
+            <option value="English">English</option>
+            <option value="Portuguese">Portuguese</option>
+          </select>
 
           {role === "admin" && (
             <div className={styles.column}>

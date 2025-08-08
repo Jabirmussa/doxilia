@@ -2,6 +2,8 @@
 "use client"
 
 import { useEffect, useState } from 'react';
+import { useLanguage } from "@/src/app/contexts/LanguageContext";
+import { dictionaries } from "@/src/app/contexts/dictionaries";
 import "./Allclients.css";
 
 type Accountant = {
@@ -10,6 +12,8 @@ type Accountant = {
 };
 
 export default function AllAccountants() {
+  const { language } = useLanguage();
+  const t = (key: string) => dictionaries[language]?.[key] || key;
   const [accountants, setAccountants] = useState<Accountant[]>([]);
   const [search, setSearch] = useState('');
 
@@ -35,11 +39,11 @@ export default function AllAccountants() {
   return (
     <div className="all-clients">
       <div className="client-list-header">
-        <h1>All accountants</h1>
+        <h1>{t('Allaccountants')}</h1>
         <div className="search-client">
-          <input 
-            type="text" 
-            placeholder="Search in accountants" 
+          <input
+            type="text"
+            placeholder={t('Searchinaccountants')}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -47,7 +51,7 @@ export default function AllAccountants() {
         </div>
         <button className="add-client-bottom">
           <img src="/plus.svg" alt="" />
-          <span>add accountant</span>
+          <span>{t('addAccountantTitle')}</span>
         </button>
       </div>
 
@@ -62,10 +66,10 @@ export default function AllAccountants() {
               <div className="add-task-open-btn">
                 <button>
                   <img src="/plus.svg" alt="" />
-                  <span>add task</span>
+                  <span>{t('addTask')}</span>
                 </button>
                 <button>
-                  <span>open</span>
+                  <span>{t('open')}</span>
                   <img src="/chevron.svg" alt="" />
                 </button>
               </div>

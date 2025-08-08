@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import TaskTable from "@/components/TaskTable";
 import "@/components/TaskTable.css";
 import Sidebar from "@/components/SidebarTemp";
@@ -8,9 +7,11 @@ import "@/components/Sidebar.css";
 import AllFiles from "@/components/AllFiles";
 import Account from "@/components/Account";
 import { useRouter } from "next/navigation"; 
+import AddDocument from "@/components/AddDocument";
+import { useDashboard } from "@/src/app/contexts/DashboardContext";
 
 const ClientDashboard = () => {
-  const [activeScreen, setActiveScreen] = useState<string>('dashboard');
+  const { activeScreen, setActiveScreen } = useDashboard();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -22,6 +23,7 @@ const ClientDashboard = () => {
     if (activeScreen === 'logout') {
       handleLogout();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeScreen]);
 
   const renderMainContent = () => {
@@ -34,6 +36,10 @@ const ClientDashboard = () => {
           </div>
         );
       case 'documents':
+        return <AllFiles />;
+      case 'add-document':
+        return <AddDocument onClose={() => setActiveScreen("documents")} />;
+      case 'all-documents':
         return <AllFiles />;
       case 'account':
       case 'settings':
@@ -50,7 +56,7 @@ const ClientDashboard = () => {
   return (
     <div className="dashboard">
       <section className="dashboard">
-        <Sidebar role="client" onSelect={(screen) => setActiveScreen(screen)} />
+        <Sidebar role="client" onSelect={setActiveScreen} />
         <main className="dashboard-content">
           {renderMainContent()}
         </main>

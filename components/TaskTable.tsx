@@ -4,6 +4,8 @@
   "use client";
   import toast from "react-hot-toast";
   import React, { useEffect, useState } from "react";
+  import { useLanguage } from "@/src/app/contexts/LanguageContext";
+  import { dictionaries } from "@/src/app/contexts/dictionaries";
   import "./TaskTable.css";
   import RejectModal from "@/components/RejectModal";
 
@@ -30,6 +32,8 @@
   
   
   const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
+    const { language } = useLanguage();
+    const t = (key: string) => dictionaries[language]?.[key] || key;
     const [role, setRole] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [accId, setAccId] = useState<string | null>(null);
@@ -360,180 +364,175 @@
     return (
       <div className="task-list">
         <div className="task-header">
-          <span>Status</span>
-          {role === 'accountant' &&(<span>Client</span>)}
-          <span>Due Date</span>
-          <span>What</span>
-          <span>Who</span>
-          <span>Action</span>
+          <span>{t('status')}</span>
+          {role === 'accountant' && (<span>{t('client')}</span>)}
+          <span>{t('dueDate')}</span>
+          <span>{t('what')}</span>
+          <span>{t('who')}</span>
+          <span>{t('action')}</span>
         </div>
 
         {[...tasks]
-        .sort((a, b) => {
-          const isAClosed = a.status.toLowerCase() === "close";
-          const isBClosed = b.status.toLowerCase() === "close";
+          .sort((a, b) => {
+            const isAClosed = a.status.toLowerCase() === "close";
+            const isBClosed = b.status.toLowerCase() === "close";
 
-          if (isAClosed && isBClosed) {
+            if (isAClosed && isBClosed) {
+              return b._id.localeCompare(a._id);
+            }
+            if (isAClosed) return 1;
+            if (isBClosed) return -1;
             return b._id.localeCompare(a._id);
-          }
-
-          if (isAClosed) return 1;
-
-          if (isBClosed) return -1;
-
-          return b._id.localeCompare(a._id);
-        }).map((task, idx) => (
-          <div className="task-items" key={idx}>
-          <div key={idx} onClick={() => handleToggle(idx)}  className="task-item">
-            <div className="task-row">
-              <span className="status-row">
-                <span
-                  className={`status-dot ${
-                    task.status.toLowerCase() === "close"
-                      ? "close"
-                      : task.status.toLowerCase() === "checking"
-                      ? "checking"
-                      : task.status.toLowerCase() === "open"
-                      ? "open"
-                      : "upcoming"
-                  }`}
-                />
-                <span
-                  className={`status-color ${
-                    task.status.toLowerCase() === "close"
-                      ? "close"
-                      : task.status.toLowerCase() === "checking"
-                      ? "checking"
-                      : task.status.toLowerCase() === "open"
-                      ? "open"
-                      : "upcoming"
-                  }`}
-                >
-                  {task.status.toUpperCase()}
-                </span>
-              </span>
-              {role !== 'client'&&(
-                <span>{clientNames[task.client_id ?? ""] ?? "Loading..."}</span>
-              )}
-              <span><TaskDate dateString={task.due_date} /></span>
-              <span>{task.what}</span>
-              <span>{task.who}</span>
-              <span className="toggle-span">
-                <button
-                  className={`toggle-btn ${expandedIndex === idx ? "active" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggle(idx);
-                  }}
-                >
-                  <span>{expandedIndex === idx ? "Close" : "Open"}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
-                    <path d="M7.93665 16.25L13.1866 11L7.93665 5.75" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-
-              </span>
-            </div>
-
-            {expandedIndex === idx && (
-              <div className="task-details">
-                  {role === 'client' &&(
-                    <div className="detail-grid">
-                      <div className="detail-item">
-                        <span className="payment-id">
-                          <strong>Payment ID</strong>
-                          <img
-                            className="copy"
-                            src="/copy.png"
-                            alt="copy-png"
-                            style={{ cursor: "pointer", marginLeft: "8px" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              copyToClipboard(task.payment_id)}
-                            } 
-
-                            title="Copy Payment ID"
-                          />
-                        </span>
-                        <span>{task.payment_id}</span>
-                      </div>
-                      <div className="detail-item">
-                        <span>
-                          <strong>Amount</strong>
-                        </span>
-                        <span>{task.amount}.00 mzn</span>
-                      </div>
-                      <div className="detail-item">
-                        <span>
-                          <strong>Period</strong>
-                        </span>
-                        <span>{formatPeriod(task.period)}</span>
-                      </div>
-                      <div className="detail-item">
-                        <span>
-                          <strong>Guide</strong>{" "}
-                        </span>
-
-                        {task?.guide ? (
-                          <a href={task.guide} onClick={(e) => { e.stopPropagation() }} target="_blank" rel="noreferrer">
-                            View PDF
-                          </a>
-                        ) : (
-                          <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px'}}>
-                            Waiting guide...
-                          </span>
-                        )}
-                      </div>
-                      <div className="detail-item">
-                        <strong>Upload</strong>{" "}
-                        {task?.guide ? (
-                          <>
-                            <input
-                              type="file"
-                              name="uploadLink"
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) => handleUpload(e, task._id)}
-                            />
-                            <a href={task.upload} onClick={(e) => { e.stopPropagation() }} target="_blank" rel="noreferrer">
-                            POP (PDF)
-                            </a>
-                          </>
-                        ) : (
-                          <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px'}}>
-                            Waiting guide...
-                          </span>
-                        )}  
-                      </div>
-                    </div>
-                  )}
-
-                  {task.description && role === 'client' && (
-                    <div className="rejection-reason">
-                      <strong>Reason for rejection:</strong>
-                      <p>{task.description}</p>
-                    </div>
-                  )}
-
+          }).map((task, idx) => (
+            <div className="task-items" key={idx}>
+              <div key={idx} onClick={() => handleToggle(idx)} className="task-item">
+                <div className="task-row">
+                  <span className="status-row">
+                    <span
+                      className={`status-dot ${
+                        task.status.toLowerCase() === "close"
+                          ? "close"
+                          : task.status.toLowerCase() === "checking"
+                            ? "checking"
+                            : task.status.toLowerCase() === "open"
+                              ? "open"
+                              : "upcoming"
+                      }`}
+                    />
+                    <span
+                      className={`status-color ${
+                        task.status.toLowerCase() === "close"
+                          ? "close"
+                          : task.status.toLowerCase() === "checking"
+                            ? "checking"
+                            : task.status.toLowerCase() === "open"
+                              ? "open"
+                              : "upcoming"
+                      }`}
+                    >
+                      {task.status.toUpperCase()}
+                    </span>
+                  </span>
                   {role !== 'client' && (
-                    <div className="detail-grid-accountant">
-                      {task?.upload && (
-                        <>
-                          <div className="detail-item">
+                    <span>{clientNames[task.client_id ?? ""] ?? t('loading')}</span>
+                  )}
+                  <span><TaskDate dateString={task.due_date} /></span>
+                  <span>{task.what}</span>
+                  <span>{task.who}</span>
+                  <span className="toggle-span">
+                    <button
+                      className={`toggle-btn ${expandedIndex === idx ? "active" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggle(idx);
+                      }}
+                    >
+                      <span>{expandedIndex === idx ? t('close') : t('open')}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                        <path d="M7.93665 16.25L13.1866 11L7.93665 5.75" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+
+                {expandedIndex === idx && (
+                  <div className="task-details">
+                    {role === 'client' && (
+                      <div className="detail-grid">
+                        <div className="detail-item">
+                          <span className="payment-id">
+                            <strong>{t('paymentId')}</strong>
+                            <img
+                              className="copy"
+                              src="/copy.png"
+                              alt="copy-png"
+                              style={{ cursor: "pointer", marginLeft: "8px" }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(task.payment_id)
+                              }}
+                              title={t('copyPaymentId')}
+                            />
+                          </span>
+                          <span>{task.payment_id}</span>
+                        </div>
+                        <div className="detail-item">
+                          <span>
+                            <strong>{t('amount')}</strong>
+                          </span>
+                          <span>{task.amount}.00 mzn</span>
+                        </div>
+                        <div className="detail-item">
+                          <span>
+                            <strong>{t('period')}</strong>
+                          </span>
+                          <span>{formatPeriod(task.period)}</span>
+                        </div>
+                        <div className="detail-item">
+                          <span>
+                            <strong>{t('guide')}</strong>{" "}
+                          </span>
+
+                          {task?.guide ? (
+                            <a href={task.guide} onClick={(e) => { e.stopPropagation() }} target="_blank" rel="noreferrer">
+                              {t('viewPdf')}
+                            </a>
+                          ) : (
+                            <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
+                              {t('waitingGuide')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="detail-item">
+                          <strong>{t('upload')}</strong>{" "}
+                          {task?.guide ? (
+                            <>
+                              <input
+                                type="file"
+                                name="uploadLink"
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => handleUpload(e, task._id)}
+                              />
+                              <a href={task.upload} onClick={(e) => { e.stopPropagation() }} target="_blank" rel="noreferrer">
+                                {t('popPdf')}
+                              </a>
+                            </>
+                          ) : (
+                            <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
+                              {t('waitingGuide')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {task.description && role === 'client' && (
+                      <div className="rejection-reason">
+                        <strong>{t('reasonForRejection')}</strong>
+                        <p>{task.description}</p>
+                      </div>
+                    )}
+
+                    {role !== 'client' && (
+                      <div className="detail-grid-accountant">
+                        {task?.upload && (
+                          <>
+                            <div className="detail-item">
                               <a href={task.upload} target="_blank" rel="noreferrer">
                                 <img src="/file-text.png" alt="" />
                                 <span>{formatFilename(task.upload)}</span>
                               </a>
-                          </div>
-                          <button
-                           className="aprove-btn"
-                           onClick={(e) => {
-                              e.stopPropagation();
-                              handleApprove(task._id);
-                            }}
-                           > 
-                            <img src="/check.png" alt="" />
-                            <span>Approve file</span>
-                          </button>
+                            </div>
+                            <button
+                              className="aprove-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleApprove(task._id);
+                              }}
+                            >
+                              <img src="/check.png" alt="" />
+                              <span>{t('approveFile')}</span>
+                            </button>
                             <button
                               className="reject-btn"
                               onClick={(e) => {
@@ -542,52 +541,46 @@
                               }}
                             >
                               <img src="/check.png" alt="" />
-                              <span>Reject file</span>
+                              <span>{t('rejectFile')}</span>
                             </button>
-                        </>
-                      )}
+                          </>
+                        )}
 
-                      <div className="detail-item">
-                        <strong>Upload GUIDE</strong>{" "}
-                        <input
-                          type="file"
-                          name="guide"
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => handleGuideUpload(e, task._id)}
-                          />
-                      </div>
-                      {task?.guide && (
                         <div className="detail-item">
-                              <a href={task.guide} target="_blank" rel="noreferrer">
-                                Check (Guide PDF)
-                              </a>
+                          <strong>{t('uploadGuide')}</strong>{" "}
+                          <input
+                            type="file"
+                            name="guide"
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => handleGuideUpload(e, task._id)}
+                          />
                         </div>
-                      )}
-                    </div>
-                  )}
-
+                        {task?.guide && (
+                          <div className="detail-item">
+                            <a href={task.guide} target="_blank" rel="noreferrer">
+                              {t('checkGuidePdf')}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          {role !== 'client'&&(
-            <div className="task-trash"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(task._id);
-              }}
-            >
-            <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.375 5.25H3.95833H16.625" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M15.0416 5.24998V16.3333C15.0416 16.7532 14.8748 17.156 14.5778 17.4529C14.2809 17.7498 13.8782 17.9166 13.4583 17.9166H5.54159C5.12166 17.9166 4.71893 17.7498 4.422 17.4529C4.12507 17.156 3.95825 16.7532 3.95825 16.3333V5.24998M6.33325 5.24998V3.66665C6.33325 3.24672 6.50007 2.84399 6.797 2.54706C7.09393 2.25013 7.49666 2.08331 7.91659 2.08331H11.0833C11.5032 2.08331 11.9059 2.25013 12.2028 2.54706C12.4998 2.84399 12.6666 3.24672 12.6666 3.66665V5.24998"
-                  stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                />
-                <path d="M7.91675 9.20831V13.9583" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M11.0833 9.20831V13.9583" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+
+              {role !== 'client' && (
+                <div className="task-trash"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(task._id);
+                  }}
+                >
+                  {/* ícone lixeira */}
+                </div>
+              )}
             </div>
-          )}
-          </div>
-        ))}
+          ))}
+
         {selectedTask && (
           <RejectModal
             isOpen={modalOpen}
@@ -597,12 +590,12 @@
             }}
             onSubmit={(reason) => handleRejectSubmit(reason)}
             task={selectedTask}
-            clientName={clientNames[selectedTask.client_id ?? ""] ?? "Client"}
+            clientName={clientNames[selectedTask.client_id ?? ""] ?? t('client')}
           />
         )}
-
       </div>
     );
+
   };
 
   export default TaskTable;
