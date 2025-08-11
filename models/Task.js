@@ -1,67 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import mongoose, { Schema, model, models } from 'mongoose';
-import { type } from 'os';
+import { Schema, model, models } from 'mongoose';
+
+const subTaskSchema = new Schema({
+  amount: { type: Number, required: true },
+  payment_id: { type: String, default: '' },
+  period: { type: String, required: true },
+  due_date: { type: String, required: true },
+  what: { type: String, required: true },
+}, { _id: false });
 
 const taskSchema = new Schema({
-  status: {
-    type: String,
-    required: true,
-    enum: ['UPCOMING', 'CHECKING', 'OPEN', 'CLOSE'],
-    default: 'UPCOMING',
-  },
-  client_id: {
-    type: Schema.Types.ObjectId,
-    ref: 'Client',
-    required: true,
-  },
-  accountant_id: {
-    type: Schema.Types.ObjectId,
-    ref: 'Accountant',
-    required: true,
-  },
-  amount: {
-    type: Number,
-  },
-  period: {
-    type: String,
-    required: true,
-  },
-  due_date: {
-    type: String,
-    required: true,
-  },
-  what: {
-    type: String,
-    required: true,
-  },
-  who: {
-    type: String,
-    enum: ["INSS", "IVA", "IRPC", "IRPS", "MULTA"],
-    default: "INSS",
-    required: true,
-  },
-  payment_id: {
-    type: String,
-  },
-  guide: {
-    type: String,
-  },
-  subTasks: [
-    {
-      amount: Number,
-      payment_id: String,
-      guide: String,
-      // due_date: String,
-      // period: String,
-      // what: String
-    }
-  ],
-  upload: {
-    type: String,
-  },
-  description: {
-    type: String,
-  },
+  status: { type: String, required: true },
+  client_id: { type: String, required: true },
+  accountant_id: { type: String, required: true },
+  amount: { type: Number, required: true },
+  period: { type: String, required: true },
+  due_date: { type: String, required: true },
+  what: { type: String, required: true },
+  who: { type: String, required: true },
+  payment_id: { type: String, default: '' },
+  guide: { type: String, default: '' },
+  upload: { type: String, default: '' },
+  subTasks: [subTaskSchema],
 }, { timestamps: true });
 
-export default models.Task || model('Task', taskSchema);
+const Task = models.Task || model('Task', taskSchema);
+
+export default Task;
