@@ -62,7 +62,7 @@ export default function AddTask() {
     // period: string;
     // what: string;
   }[]
->(Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: "", due_date: "", period: "", what: "" })));
+>(Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: "" })));
 
   const [formData, setFormData] = useState<FormDataState>({
     status: "UPCOMING",
@@ -159,8 +159,12 @@ export default function AddTask() {
       }
 
       if (formData.who === "IRPS") {
-        data.append("subTasks", JSON.stringify(subTasks));
+        const cleanedSubTasks = subTasks.filter(
+          st => st.amount && st.payment_id 
+        );
+        data.append("subTasks", JSON.stringify(cleanedSubTasks));
       }
+
 
       if (uploadFile) {
         data.append("upload", uploadFile);
@@ -202,6 +206,15 @@ export default function AddTask() {
       setLoading(false);
     }
   }
+
+  const handleSubTaskChange = (index: number, field: string, value: string) => {
+    setSubTasks(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
 
 
   return (
@@ -375,22 +388,15 @@ export default function AddTask() {
                 className={styles.inputItem}
               />
 
-              {subTasks.map((task, index) => (
+              {subTasks.map((st, index) => (
                 <div key={index} style={{ border: '1px solid #ccc', padding: '10px', marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <h4>IRPS #{index + 1}</h4>
 
                   <label>{t("amount")}</label>
                   <input
                     type="number"
-                    value={task.amount}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setSubTasks(prev => {
-                        const copy = [...prev];
-                        copy[index].amount = value;
-                        return copy;
-                      });
-                    }}
+                    value={st.amount}
+                    onChange={(e) => handleSubTaskChange(index, "amount", e.target.value)}
                     className={styles.inputItem}
                     required
                   />
@@ -398,15 +404,8 @@ export default function AddTask() {
                   <label>{t("paymentId")}</label>
                   <input
                     type="text"
-                    value={task.payment_id}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setSubTasks(prev => {
-                        const copy = [...prev];
-                        copy[index].payment_id = value;
-                        return copy;
-                      });
-                    }}
+                    value={st.payment_id}
+                    onChange={(e) => handleSubTaskChange(index, "payment_id", e.target.value)}
                     className={styles.inputItem}
                     required
                   />
