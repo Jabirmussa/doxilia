@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import UploadBtn from '@/components/UploadBtn';
 import GlobalFileDrop from '@/components/GlobalFileDrop';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -10,12 +11,15 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/';
+
   return (
     <LanguageProvider>
       <DashboardProvider>
         {children}
-        <UploadBtn />
-        <GlobalFileDrop /> {/* drag & drop global */}
+        {!isLoginPage && <UploadBtn />}
+        {!isLoginPage && <GlobalFileDrop />}
       </DashboardProvider>
     </LanguageProvider>
   );

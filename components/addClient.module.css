@@ -67,8 +67,10 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
+  span{
+    margin-right: 20px;
+  }
 }
-
 
 .loader {
   width: 20px;

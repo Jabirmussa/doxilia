@@ -24,7 +24,7 @@
     h2{
         font-size: 1.875rem;
         font-weight: 400;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
     }
 
     label{
@@ -36,7 +36,7 @@
         background-color: #FFFFFF;
         border: none;
         border-radius: 10px;
-        margin-bottom: 24px;
+        /* margin-bottom: 24px; */
         color: #5c5a5a;
     }
     /* input[type="password"]{

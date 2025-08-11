@@ -85,4 +85,8 @@ export const dictionary = {
   addAccountantTitle: "Adicionar Contabilista",
   Allaccountants: "Todos os contabilistas",
   Searchinaccountants: "Pesquisar por contabilistas",
+  other: "Outro",
+  quantityOfIRPS: "Quantidade de IRPS",
+  quantityOfIRPC: "Quantidade de IRPC",
+  searchInTasks: "Pesquisar por tarefas",
 };

@@ -77,4 +77,8 @@ export const dictionary = {
   removeFile: "Remove file",
   searchInClients: "Search in clients",
   selectClient: "Select Client",
+  other: "Other",
+  quantityOfIRPS: "Quantity of IRPS",
+  quantityOfIRPC: "Quantity of IRPC",
+  searchInTasks: "Search in tasks",
 };

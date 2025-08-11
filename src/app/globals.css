@@ -157,12 +157,13 @@ li{
   width: 100%;
   background-color: var(--blue-bg);
   color: #fff;
-  .rectangle img{
+  .rectangle {
+    position: absolute;
     width: calc(100% - 60px);
     height: calc(100% - 60px);
-    position: absolute;
     top: 30px;
     left: 30px;
+    border-style: dashed;
   }
   .upload-content{
     display: flex;

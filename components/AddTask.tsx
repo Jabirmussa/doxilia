@@ -18,22 +18,44 @@ interface Accountant {
   name: string;
 }
 
+interface FormDataState {
+  status: string;
+  client_id: string;
+  accountant_id: string;
+  amount: string;
+  period: string;
+  due_date: string;
+  what: string;
+  who: string;
+  whoCustom?: string;
+  payment_id: string;
+}
+
 export default function AddTask() {
   const { language } = useLanguage();
-  const t = (key: string) => dictionaries[language]?.[key] || key
+  const t = (key: string) => dictionaries[language]?.[key] || key;
+
   const [accountType, setAccountType] = useState("");
   const [accountId, setAccountId] = useState("");
   const [clients, setClients] = useState<Client[]>([]);
   const [accountants, setAccountants] = useState<Accountant[]>([]);
   const [loading, setLoading] = useState(false);
   const [guideFile, setGuideFile] = useState<File | null>(null);
-  const [uploadFile, setUploadFile] = useState<File | null>(null); 
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const dueDateInputRef = useRef<HTMLInputElement>(null);
   const periodInputRef = useRef<HTMLInputElement>(null);
+  const [whoQuantity, setWhoQuantity] = useState(1);
+  const [subTasks, setSubTasks] = useState<
+  {
+    amount: string;
+    payment_id: string;
+    due_date: string;
+    period: string;
+    what: string;
+  }[]
+>(Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", due_date: "", period: "", what: "" })));
 
-
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataState>({
     status: "UPCOMING",
     client_id: "",
     accountant_id: "",
@@ -56,7 +78,7 @@ export default function AddTask() {
     setFormData((prev) => ({
       ...prev,
       client_id: selectedClientId || "",
-      accountant_id: accType === "accountant" && accId ? accId : prev.accountant_id
+      accountant_id: accType === "accountant" && accId ? accId : prev.accountant_id,
     }));
 
     if (accType === "admin") {
@@ -71,7 +93,6 @@ export default function AddTask() {
       .then((data) => setClients(data))
       .catch((err) => console.error("Erro ao buscar clientes:", err));
   }, []);
-
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -91,6 +112,12 @@ export default function AddTask() {
     }
   }
 
+  function handleWhoQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = Math.max(1, Number(e.target.value));
+    setWhoQuantity(value);
+    setSubTasks(Array.from({ length: value }, () => ({ amount: "", payment_id: "", due_date: "", period: "", what: "" })));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -100,10 +127,21 @@ export default function AddTask() {
 
       const finalStatus = guideFile ? "OPEN" : formData.status;
 
+      const finalWho =
+        formData.who === "custom"
+          ? formData.whoCustom || ""
+          : formData.who;
+
       data.append("status", finalStatus);
 
       Object.entries(formData).forEach(([key, value]) => {
-        if (key !== "status") data.append(key, value);
+        if (key !== "status" && key !== "whoCustom") {
+          if (key === "who") {
+            data.append("who", finalWho);
+          } else {
+            data.append(key, value);
+          }
+        }
       });
 
       if (guideFile) {
@@ -134,7 +172,7 @@ export default function AddTask() {
         period: "",
         due_date: "",
         what: "",
-        who: "",
+        who: "INSS",
         payment_id: "",
       });
       setGuideFile(null);
@@ -149,6 +187,7 @@ export default function AddTask() {
       setLoading(false);
     }
   }
+
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
@@ -242,6 +281,7 @@ export default function AddTask() {
         </div>
 
         <div className={styles.column}>
+              
           <label>{t("period")}</label>
           <div className={styles.dateWrapper}>
             <input
@@ -274,14 +314,53 @@ export default function AddTask() {
 
           </div>
           <label>{t("who")}</label>
-          <input
-            type="text"
-            name="who"
-            value={formData.who}
-            onChange={handleChange}
-            className={styles.inputItem}
-            required
-          />
+          {formData.who === "custom" ? (
+            <input
+              type="text"
+              name="who"
+              value={formData.whoCustom || ""}
+              onChange={(e) => setFormData(prev => ({ ...prev, whoCustom: e.target.value }))}
+              className={styles.inputItem}
+              placeholder={t("typeHere")}
+              required
+            />
+          ) : (
+            <select
+              name="who"
+              value={formData.who}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "custom") {
+                  setFormData(prev => ({ ...prev, who: "custom", whoCustom: "" }));
+                } else {
+                  setFormData(prev => ({ ...prev, who: value, whoCustom: undefined }));
+                }
+              }}
+              className={styles.inputItem}
+              required
+            >
+              <option value="">-- {t("select")} --</option>
+              <option value="INSS">INSS</option>
+              <option value="IVA">IVA</option>
+              <option value="IRPC">IRPC</option>
+              <option value="IRPS">IRPS</option>
+              <option value="MULTA">MULTA</option>
+              <option value="custom">{t("other")}</option>
+            </select>
+          )}
+
+          {formData.who === 'IRPS' && (
+            <>
+              <label>{t("quantityOfIRPS") || "Quantidade de IRPS"}</label>
+              <input
+                type="number"
+                min={1}
+                value={whoQuantity}
+                onChange={handleWhoQuantityChange}
+                className={styles.inputItem}
+              />
+            </>
+          )}
 
           <label>{t("what")}</label>
           <input

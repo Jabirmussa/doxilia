@@ -28,10 +28,15 @@
 
   type TaskTableProps = {
     type: "client" | "accountant";
+    onNavigate?: (screen: string) => void;
   };
-  
-  
-  const TaskTable: React.FC<TaskTableProps> = ({ type }) => {
+
+  type Props = {
+  onNavigate: (screen: string) => void;
+};
+
+
+  const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
     const { language } = useLanguage();
     const t = (key: string) => dictionaries[language]?.[key] || key;
     const [role, setRole] = useState<string | null>(null);
@@ -50,6 +55,7 @@
     const [clientNames, setClientNames] = useState<{ [key: string]: string }>({});
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
        if (!role || !userId) return;
@@ -363,6 +369,25 @@
 
     return (
       <div className="task-list">
+        <div className="client-list-header">
+          {role ===  'accountant' && (
+            <>
+            <div className="search-client">
+              <input
+                type="text"
+                placeholder={t("searchInTasks")}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+                <img src="/search.svg" alt="search" />
+            </div>
+            <button className="add-client-bottom" onClick={() => onNavigate?.('add-tasks')}>
+              <img src="/plus.svg" alt="" />
+              <span>{t("addTask")}</span>
+            </button>
+            </>
+          )}
+        </div>
         <div className="task-header">
           <span>{t('status')}</span>
           {role === 'accountant' && (<span>{t('client')}</span>)}
@@ -393,10 +418,10 @@
                         task.status.toLowerCase() === "close"
                           ? "close"
                           : task.status.toLowerCase() === "checking"
-                            ? "checking"
-                            : task.status.toLowerCase() === "open"
-                              ? "open"
-                              : "upcoming"
+                          ? "checking"
+                          : task.status.toLowerCase() === "open"
+                          ? "open"
+                          : "upcoming"
                       }`}
                     />
                     <span

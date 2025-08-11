@@ -118,6 +118,9 @@
     width: 36px;
     height: 36px;
     margin-left: 10px;
+    span{
+      margin: 0;
+    }
     svg {
       width: 18px;
       height: 18px;

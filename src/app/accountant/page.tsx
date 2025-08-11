@@ -12,6 +12,7 @@ import "@/components/Sidebar.css";
 import AddTask from '@/components/AddTask';
 import AllFiles from '@/components/AllFiles';
 import Account from '@/components/Account';
+import AddDocument from '@/components/AddDocument';
 
 const AccountantDashboard = () => {
   const [activeScreen, setActiveScreen] = useState<string>('dashboard');
@@ -38,6 +39,10 @@ const AccountantDashboard = () => {
           </div>
         );
       case 'documents':
+        return <AllFiles />;
+      case 'add-document':
+        return <AddDocument onClose={() => setActiveScreen("documents")} />;
+      case 'all-documents':
         return <AllFiles />;
       case 'add-client':
         return <AddClient />;

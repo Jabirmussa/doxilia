@@ -14,6 +14,9 @@
   @media screen and (min-width: 48rem) { 
      max-height: 400px;
   }
+  .client-list-header{
+    margin-top: 30px;
+  }
 }
 .task-list::-webkit-scrollbar {
   width: 4px;

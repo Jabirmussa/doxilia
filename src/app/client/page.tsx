@@ -1,12 +1,12 @@
 'use client';
 import React, { useEffect } from "react";
 import TaskTable from "@/components/TaskTable";
-import "@/components/TaskTable.css";
 import Sidebar from "@/components/SidebarTemp";
+import "@/components/TaskTable.css";
 import "@/components/Sidebar.css";
 import AllFiles from "@/components/AllFiles";
 import Account from "@/components/Account";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import AddDocument from "@/components/AddDocument";
 import { useDashboard } from "@/src/app/contexts/DashboardContext";
 

@@ -27,31 +27,37 @@ export default function AddDocument({ onClose, prefilledFile }: AddDocumentProps
   const [accountId, setAccountId] = useState<string>("");
 
   useEffect(() => {
-    const role = localStorage.getItem("role") || "";
-    const userId = localStorage.getItem("user_id") || "";
-    const selectedClientId = localStorage.getItem("selectedClientId") || "";
+    const storedRole = localStorage.getItem("role") || "";
+    const storedUserId = localStorage.getItem("user_id") || "";
+    const storedClientId = localStorage.getItem("selectedClientId") || "";
 
-    setAccountType(role);
-    setAccountId(userId);
+    setAccountType(storedRole);
+    setAccountId(storedUserId);
 
-    if (role === "client") {
-      setClientId(userId);
-    } else if (role === "accountant") {
-      fetch(`/api/clients?accountantId=${userId}`)
-        .then(res => res.json())
-        .then(data => setClients(data.clients || []))
-        .catch(err => console.error("Erro ao buscar clientes:", err));
-      setClientId(selectedClientId);
-    } else if (role === "admin") {
-      fetch("/api/clients")
-        .then(res => res.json())
-        .then(data => setClients(data.clients || []))
-        .catch(err => console.error("Erro ao buscar clientes:", err));
-      setClientId(selectedClientId);
-    } else {
-      setClientId(selectedClientId);
+    if (storedRole === "client") {
+      setClientId(storedUserId);
+      return;
     }
+
+    let url = "/api/clients";
+    if (storedRole === "accountant") {
+      url = `/api/clients?accountantId=${storedUserId}`;
+    }
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setClients(data);
+        } else if (Array.isArray(data.clients)) {
+          setClients(data.clients);
+        }
+      })
+      .catch((err) => console.error("Erro ao buscar clientes:", err));
+
+    setClientId(storedClientId);
   }, []);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -92,7 +98,7 @@ export default function AddDocument({ onClose, prefilledFile }: AddDocumentProps
         if (accountType === "accountant" || accountType === "admin") {
           setClientId("");
         }
-        onClose(); // fecha o componente após sucesso
+        onClose();
       } else {
         toast.error(data.message || "Erro ao enviar arquivo.");
       }
