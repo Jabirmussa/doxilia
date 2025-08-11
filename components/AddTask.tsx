@@ -54,15 +54,11 @@ export default function AddTask() {
   const periodInputRef = useRef<HTMLInputElement>(null);
   const [whoQuantity, setWhoQuantity] = useState(1);
   const [subTasks, setSubTasks] = useState<
-  {
-    amount: string;
-    payment_id: string;
-    guide?: string;
-    // due_date: string;
-    // period: string;
-    // what: string;
-  }[]
->(Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: "" })));
+    { amount: string; payment_id: string; guide?: File | null }[]
+  >(
+    Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: null }))
+  );
+
 
   const [formData, setFormData] = useState<FormDataState>({
     status: "UPCOMING",
@@ -159,11 +155,18 @@ export default function AddTask() {
       }
 
       if (formData.who === "IRPS") {
-        const cleanedSubTasks = subTasks.filter(
-          st => st.amount && st.payment_id 
-        );
-        data.append("subTasks", JSON.stringify(cleanedSubTasks));
+        const cleanedSubTasks = subTasks.filter(st => st.amount && st.payment_id);
+
+        // Adiciona os dados + arquivos no FormData
+        cleanedSubTasks.forEach((st, idx) => {
+          data.append(`subTasks[${idx}][amount]`, st.amount);
+          data.append(`subTasks[${idx}][payment_id]`, st.payment_id);
+          if (st.guide) {
+            data.append(`subTasks[${idx}][guide]`, st.guide);
+          }
+        });
       }
+
 
 
       if (uploadFile) {
@@ -214,7 +217,6 @@ export default function AddTask() {
       return updated;
     });
   };
-
 
 
   return (
@@ -414,15 +416,16 @@ export default function AddTask() {
                     type="file"
                     accept="application/pdf"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
+                      const file = e.target.files?.[0] || null;
                       setSubTasks(prev => {
                         const copy = [...prev];
-                        copy[index].guide = file ? file.name : "";
+                        copy[index].guide = file;
                         return copy;
                       });
                     }}
                     className={styles.inputItem}
                   />
+
                 </div>
               ))}
             </>

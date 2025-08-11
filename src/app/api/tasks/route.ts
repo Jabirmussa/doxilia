@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
 import Notification from '@/models/Notification';
@@ -28,30 +28,7 @@ export async function POST(req: Request) {
     const who = formData.get('who');
     const payment_id = formData.get('payment_id') || '';
 
-    const subTasksJson = formData.get('subTasks') as string | null;
-    let subTasks = [];
-
-    if (who === 'IRPS' && subTasksJson) {
-      try {
-        subTasks = JSON.parse(subTasksJson);
-        if (!Array.isArray(subTasks)) throw new Error();
-      } catch (err) {
-        return NextResponse.json({ message: 'Invalid subTasks format.' }, { status: 400 });
-      }
-    }
-
-    const guideFile = formData.get('guide') as File | null;
-    const uploadFile = formData.get('upload') as File | null;
-
-    if (
-      !status || !client_id || !accountant_id ||
-      !period || !due_date || !what || !who
-    ) {
-      return NextResponse.json({
-        message: 'Missing required fields!',
-      }, { status: 400 });
-    }
-
+    // função utilitária pra salvar arquivos
     const saveFile = async (file: File): Promise<string> => {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -68,9 +45,46 @@ export async function POST(req: Request) {
       return `/uploads/${filename}`;
     };
 
+    // Validação de campos obrigatórios
+    if (!status || !client_id || !accountant_id || !period || !due_date || !what || !who) {
+      return NextResponse.json({
+        message: 'Missing required fields!',
+      }, { status: 400 });
+    }
+
+    // Arquivos gerais (não relacionados a subtasks)
+    const guideFile = formData.get('guide') as File | null;
+    const uploadFile = formData.get('upload') as File | null;
+
     const guideUrl = guideFile ? await saveFile(guideFile) : '';
     const uploadUrl = uploadFile ? await saveFile(uploadFile) : '';
 
+    // Monta as subtasks (para IRPS)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subTasks: any[] = [];
+    if (who === 'IRPS') {
+      let idx = 0;
+      while (formData.has(`subTasks[${idx}][amount]`)) {
+        const stAmount = parseFloat(formData.get(`subTasks[${idx}][amount]`) as string);
+        const stPaymentId = formData.get(`subTasks[${idx}][payment_id]`) as string;
+
+        let stGuideUrl = '';
+        const stGuideFile = formData.get(`subTasks[${idx}][guide]`) as File | null;
+        if (stGuideFile) {
+          stGuideUrl = await saveFile(stGuideFile);
+        }
+
+        subTasks.push({
+          amount: stAmount,
+          payment_id: stPaymentId,
+          guide: stGuideUrl
+        });
+
+        idx++;
+      }
+    }
+
+    // Cria a task no banco
     const newTask = new Task({
       status,
       client_id,
@@ -88,7 +102,7 @@ export async function POST(req: Request) {
 
     await newTask.save();
 
-    // Cria notificações
+    // Notificações
     try {
       if (client_id) {
         await Notification.create({
