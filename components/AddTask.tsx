@@ -29,6 +29,14 @@ interface FormDataState {
   who: string;
   whoCustom?: string;
   payment_id: string;
+  subTasks: {
+    amount: string;
+    payment_id: string;
+    guide?: string;
+    due_date?: string;
+    period?: string;
+    what?: string;
+  }[];
 }
 
 export default function AddTask() {
@@ -49,11 +57,12 @@ export default function AddTask() {
   {
     amount: string;
     payment_id: string;
-    due_date: string;
-    period: string;
-    what: string;
+    guide?: string;
+    // due_date: string;
+    // period: string;
+    // what: string;
   }[]
->(Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", due_date: "", period: "", what: "" })));
+>(Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: "", due_date: "", period: "", what: "" })));
 
   const [formData, setFormData] = useState<FormDataState>({
     status: "UPCOMING",
@@ -65,6 +74,7 @@ export default function AddTask() {
     what: "",
     who: "",
     payment_id: "",
+    subTasks: [],
   });
 
   useEffect(() => {
@@ -148,6 +158,10 @@ export default function AddTask() {
         data.append("guide", guideFile);
       }
 
+      if (formData.who === "IRPS") {
+        data.append("subTasks", JSON.stringify(subTasks));
+      }
+
       if (uploadFile) {
         data.append("upload", uploadFile);
       }
@@ -174,6 +188,7 @@ export default function AddTask() {
         what: "",
         who: "INSS",
         payment_id: "",
+        subTasks: [],
       });
       setGuideFile(null);
       setUploadFile(null);
@@ -349,7 +364,7 @@ export default function AddTask() {
             </select>
           )}
 
-          {formData.who === 'IRPS' && (
+         {formData.who === 'IRPS' && (
             <>
               <label>{t("quantityOfIRPS") || "Quantidade de IRPS"}</label>
               <input
@@ -359,8 +374,61 @@ export default function AddTask() {
                 onChange={handleWhoQuantityChange}
                 className={styles.inputItem}
               />
+
+              {subTasks.map((task, index) => (
+                <div key={index} style={{ border: '1px solid #ccc', padding: '10px', marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <h4>IRPS #{index + 1}</h4>
+
+                  <label>{t("amount")}</label>
+                  <input
+                    type="number"
+                    value={task.amount}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSubTasks(prev => {
+                        const copy = [...prev];
+                        copy[index].amount = value;
+                        return copy;
+                      });
+                    }}
+                    className={styles.inputItem}
+                    required
+                  />
+
+                  <label>{t("paymentId")}</label>
+                  <input
+                    type="text"
+                    value={task.payment_id}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSubTasks(prev => {
+                        const copy = [...prev];
+                        copy[index].payment_id = value;
+                        return copy;
+                      });
+                    }}
+                    className={styles.inputItem}
+                    required
+                  />
+                  <label>{t("guide")} (PDF)</label>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      setSubTasks(prev => {
+                        const copy = [...prev];
+                        copy[index].guide = file ? file.name : "";
+                        return copy;
+                      });
+                    }}
+                    className={styles.inputItem}
+                  />
+                </div>
+              ))}
             </>
           )}
+
 
           <label>{t("what")}</label>
           <input

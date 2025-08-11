@@ -35,9 +35,9 @@ const taskSchema = new Schema({
     required: true,
   },
   who: {
-    type: [String],
+    type: String,
     enum: ["INSS", "IVA", "IRPC", "IRPS", "MULTA"],
-    default: ["INSS"],
+    default: "INSS",
     required: true,
   },
   payment_id: {
@@ -46,6 +46,16 @@ const taskSchema = new Schema({
   guide: {
     type: String,
   },
+  subTasks: [
+    {
+      amount: Number,
+      payment_id: String,
+      guide: String,
+      // due_date: String,
+      // period: String,
+      // what: String
+    }
+  ],
   upload: {
     type: String,
   },

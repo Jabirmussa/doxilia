@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
 import Notification from '@/models/Notification';
@@ -27,11 +28,23 @@ export async function POST(req: Request) {
     const who = formData.get('who');
     const payment_id = formData.get('payment_id') || '';
 
+    const subTasksJson = formData.get('subTasks') as string | null;
+    let subTasks = [];
+
+    if (who === 'IRPS' && subTasksJson) {
+      try {
+        subTasks = JSON.parse(subTasksJson);
+        if (!Array.isArray(subTasks)) throw new Error();
+      } catch (err) {
+        return NextResponse.json({ message: 'Invalid subTasks format.' }, { status: 400 });
+      }
+    }
+
     const guideFile = formData.get('guide') as File | null;
     const uploadFile = formData.get('upload') as File | null;
 
     if (
-      !status || !client_id || !accountant_id || isNaN(amount) ||
+      !status || !client_id || !accountant_id ||
       !period || !due_date || !what || !who
     ) {
       return NextResponse.json({
@@ -70,10 +83,12 @@ export async function POST(req: Request) {
       payment_id,
       guide: guideUrl,
       upload: uploadUrl,
+      subTasks,
     });
 
     await newTask.save();
 
+    // Cria notificações
     try {
       if (client_id) {
         await Notification.create({
@@ -178,6 +193,7 @@ export async function PUT(req: Request) {
       payment_id,
       guide,
       upload,
+      subTasks,
     } = body;
 
     if (!id) {
@@ -200,6 +216,7 @@ export async function PUT(req: Request) {
     if (payment_id) task.payment_id = payment_id;
     if (guide) task.guide = guide;
     if (upload) task.upload = upload;
+    if (subTasks) task.subTasks = subTasks;
 
     await task.save();
 
