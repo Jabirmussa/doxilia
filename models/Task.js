@@ -1,11 +1,9 @@
 import { Schema, model, models } from 'mongoose';
 
 const subTaskSchema = new Schema({
-  amount: { type: Number, required: true },
+  amount: { type: Number, default: 0 },
   payment_id: { type: String, default: '' },
-  period: { type: String, required: true },
-  due_date: { type: String, required: true },
-  what: { type: String, required: true },
+  guide: { type: String, default: '' },
 }, { _id: false });
 
 const taskSchema = new Schema({
