@@ -604,7 +604,6 @@ import FeatherIcon from "./FeatherIcon";
                           {task?.subTasks?.length > 0 && (
                               <div
                                 className="detail-grid"
-                                style={{ marginTop: "15px", borderTop: "1px solid #ddd", paddingTop: "10px" }}
                               >
                                 {task.subTasks.map((sub, index) => (
                                   <React.Fragment key={index}>
