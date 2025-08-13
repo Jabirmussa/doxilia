@@ -4,6 +4,7 @@ const subTaskSchema = new Schema({
   amount: { type: Number, default: 0 },
   payment_id: { type: String, default: '' },
   guide: { type: String, default: '' },
+  upload: { type: String, default: '' },
 }, { _id: false });
 
 const taskSchema = new Schema({

@@ -27,6 +27,14 @@ export default function AddDocument({ onClose, prefilledFile }: AddDocumentProps
   const [accountId, setAccountId] = useState<string>("");
 
   useEffect(() => {
+    if (prefilledFile) {
+      setFile(prefilledFile);
+      setDescription(prefilledFile.name.replace(/\.pdf$/i, ""));
+    }
+  }, [prefilledFile]);
+
+
+  useEffect(() => {
     const storedRole = localStorage.getItem("role") || "";
     const storedUserId = localStorage.getItem("user_id") || "";
     const storedClientId = localStorage.getItem("selectedClientId") || "";
@@ -120,7 +128,7 @@ export default function AddDocument({ onClose, prefilledFile }: AddDocumentProps
 
         {file && (
           <div className="pdf-name">
-            <span>{file.name.split(' ')[0]}</span>
+            <span>{file.name}</span>
             <div className="remove-file" onClick={() => setFile(null)}>
               <FeatherIcon name="x" className="icon-svg" />
             </div>

@@ -41,7 +41,7 @@ export const dictionary = {
   newNotificationTitle: '📥 New notification',
   newNotificationBody: 'You have a new notification',
   whatsappUs: 'Whatsapp us',
-    status: "Status",
+  status: "Status",
   client: "Client",
   dueDate: "Due Date",
   what: "What",

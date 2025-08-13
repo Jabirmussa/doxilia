@@ -10,6 +10,7 @@
   import RejectModal from "@/components/RejectModal";
 
   type Task = {
+    subTasks: SubTask[];
     _id: string;
     status: string;
     client?: string;
@@ -25,6 +26,14 @@
     accountant_id?: string;
     description?: string;
   };
+
+  interface SubTask {
+    upload: string;
+    payment_id: string;
+    amount: number;
+    guide?: string;
+  }
+
 
   type TaskTableProps = {
     type: "client" | "accountant";
@@ -50,11 +59,12 @@
         setAccId(localStorage.getItem("acc_id"));
       }
     }, []);
+
     const [tasks, setTasks] = useState<Task[]>([]);
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
     const [clientNames, setClientNames] = useState<{ [key: string]: string }>({});
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [selectedTask, setSelectedTask] = useState<Task | SubTask | null>(null);
     const [search, setSearch] = useState('');
 
     useEffect(() => {
@@ -65,6 +75,7 @@
           if (!res.ok) throw new Error("Erro ao buscar tasks");
 
           const data = await res.json();
+          console.log("Tasks fetched:", data.tasks);
 
           const filtered = data.tasks.filter((task: Task) => {
             if (role === "admin") return true;
@@ -228,7 +239,7 @@
     };
 
 
-   const handleGuideUpload = async (
+    const handleGuideUpload = async (
       e: React.ChangeEvent<HTMLInputElement>,
       taskId: string
     ) => {
@@ -314,7 +325,9 @@
       return cleaned.length > 7 ? cleaned.slice(0, 18) + "..." : cleaned;
     };
 
-    const handleRejectClick = (task: Task) => {
+    type TaskOrSubTask = Task | SubTask;
+
+    const handleRejectClick = (task: TaskOrSubTask) => {
       setSelectedTask(task);
       setModalOpen(true);
     };
@@ -323,7 +336,7 @@
       if (!selectedTask) return;
 
       try {
-        const res = await fetch(`/api/tasks/reject/${selectedTask._id}`, {
+        const res = await fetch(`/api/tasks/reject/${selectedTask.payment_id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -337,7 +350,7 @@
 
         setTasks((prev) =>
           prev.map((t) =>
-            t._id === selectedTask._id ? { ...t, status: "OPEN", description: reason } : t
+            t.payment_id === selectedTask.payment_id ? { ...t, status: "OPEN", description: reason } : t
           )
         );
       } catch (err) {
@@ -366,6 +379,47 @@
       }
     };
 
+    const updateSubTask = async (taskId: string, updatedSubTask: SubTask) => {
+      setTasks(prevTasks =>
+        prevTasks.map(task => {
+          if (task._id !== taskId) return task;
+
+          const newSubTasks = task.subTasks.map(sub =>
+            sub.payment_id === updatedSubTask.payment_id ? { ...sub, ...updatedSubTask } : sub
+          );
+
+          return { ...task, subTasks: newSubTasks };
+        })
+      );
+
+      const taskToUpdate = tasks.find(t => t._id === taskId);
+      if (!taskToUpdate) return;
+
+      const body = {
+        id: taskId,
+        subTasks: taskToUpdate.subTasks.map(sub =>
+          sub.payment_id === updatedSubTask.payment_id ? { ...sub, ...updatedSubTask } : sub
+        ),
+      };
+
+      try {
+        const res = await fetch('/api/tasks', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) throw new Error('Erro ao atualizar subTask');
+
+        const data = await res.json();
+        toast.success('SubTask atualizada com sucesso!');
+      } catch (error) {
+        toast.error('Erro ao atualizar subTask');
+        console.error(error);
+      }
+    };
 
     return (
       <div className="task-list">
@@ -429,10 +483,10 @@
                         task.status.toLowerCase() === "close"
                           ? "close"
                           : task.status.toLowerCase() === "checking"
-                            ? "checking"
-                            : task.status.toLowerCase() === "open"
-                              ? "open"
-                              : "upcoming"
+                          ? "checking"
+                          : task.status.toLowerCase() === "open"
+                          ? "open"
+                          : "upcoming"
                       }`}
                     >
                       {task.status.toUpperCase()}
@@ -463,131 +517,356 @@
                 {expandedIndex === idx && (
                   <div className="task-details">
                     {role === 'client' && (
-                      <div className="detail-grid">
-                        <div className="detail-item">
-                          <span className="payment-id">
-                            <strong>{t('paymentId')}</strong>
-                            <img
-                              className="copy"
-                              src="/copy.png"
-                              alt="copy-png"
-                              style={{ cursor: "pointer", marginLeft: "8px" }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyToClipboard(task.payment_id)
-                              }}
-                              title={t('copyPaymentId')}
-                            />
-                          </span>
-                          <span>{task.payment_id}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span>
-                            <strong>{t('amount')}</strong>
-                          </span>
-                          <span>{task.amount}.00 mzn</span>
-                        </div>
-                        <div className="detail-item">
-                          <span>
-                            <strong>{t('period')}</strong>
-                          </span>
-                          <span>{formatPeriod(task.period)}</span>
-                        </div>
-                        <div className="detail-item">
-                          <span>
-                            <strong>{t('guide')}</strong>{" "}
-                          </span>
+                        <>
+                          {/* Detalhes da Tarefa Principal */}
+                          <div className="detail-grid">
+                            <div className="detail-item">
+                              <span className="payment-id">
+                                <strong>{t('paymentId')}</strong>
+                                <img
+                                  className="copy"
+                                  src="/copy.png"
+                                  alt="copy-png"
+                                  style={{ cursor: "pointer", marginLeft: "8px" }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(task.payment_id);
+                                  }}
+                                  title={t('copyPaymentId')}
+                                />
+                              </span>
+                              <span>{task.payment_id}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span>
+                                <strong>{t('amount')}</strong>
+                              </span>
+                              <span>{task.amount}.00 mzn</span>
+                            </div>
+                            <div className="detail-item">
+                              <span>
+                                <strong>{t('period')}</strong>
+                              </span>
+                              <span>{formatPeriod(task.period)}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span>
+                                <strong>{t('guide')}</strong>{" "}
+                              </span>
 
-                          {task?.guide ? (
-                            <a href={task.guide} onClick={(e) => { e.stopPropagation() }} target="_blank" rel="noreferrer">
-                              {t('viewPdf')}
-                            </a>
-                          ) : (
-                            <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
-                              {t('waitingGuide')}
-                            </span>
-                          )}
-                        </div>
-                        <div className="detail-item">
-                          <strong>{t('upload')}</strong>{" "}
-                          {task?.guide ? (
-                            <>
-                              <input
-                                type="file"
-                                name="uploadLink"
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => handleUpload(e, task._id)}
-                              />
-                              <a href={task.upload} onClick={(e) => { e.stopPropagation() }} target="_blank" rel="noreferrer">
-                                {t('popPdf')}
-                              </a>
-                            </>
-                          ) : (
-                            <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
-                              {t('waitingGuide')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                              {task?.guide ? (
+                                <a
+                                  href={task.guide}
+                                  onClick={(e) => { e.stopPropagation(); }}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {t('viewPdf')}
+                                </a>
+                              ) : (
+                                <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
+                                  {t('waitingGuide')}
+                                </span>
+                              )}
+                            </div>
+                            <div className="detail-item">
+                              <strong>{t('upload')}</strong>{" "}
+                              {task?.guide ? (
+                                <>
+                                  <input
+                                    type="file"
+                                    name="uploadLink"
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => handleUpload(e, task._id)}
+                                  />
+                                  <a
+                                    href={task.upload}
+                                    onClick={(e) => { e.stopPropagation(); }}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {t('popPdf')}
+                                  </a>
+                                </>
+                              ) : (
+                                <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
+                                  {t('waitingGuide')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
 
-                    {task.description && role === 'client' && (
-                      <div className="rejection-reason">
-                        <strong>{t('reasonForRejection')}</strong>
-                        <p>{task.description}</p>
-                      </div>
-                    )}
+                          {task?.subTasks?.length > 0 && (
+                              <div
+                                className="detail-grid"
+                                style={{ marginTop: "15px", borderTop: "1px solid #ddd", paddingTop: "10px" }}
+                              >
+                                {task.subTasks.map((sub, index) => (
+                                  <React.Fragment key={index}>
+                                    <div className="detail-item">
+                                      <span className="payment-id">
+                                        <strong>{t('paymentId')}</strong>
+                                        <img
+                                          className="copy"
+                                          src="/copy.png"
+                                          alt="copy-png"
+                                          style={{ cursor: "pointer", marginLeft: "8px" }}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            copyToClipboard(sub.payment_id);
+                                          }}
+                                          title={t('copyPaymentId')}
+                                        />
+                                      </span>
+                                      <span>{sub.payment_id}</span>
+                                    </div>
+                                    <div className="detail-item">
+                                      <span>
+                                        <strong>{t('amount')}</strong>
+                                      </span>
+                                      <span>{sub.amount}.00 mzn</span>
+                                    </div>
+                                    <div className="detail-item">
+                                      <span>
+                                        <strong>{t('period')}</strong>
+                                      </span>
+                                      {/* Exemplo: input para editar o period */}
+                                      <input
+                                        type="text"
+                                        defaultValue={formatPeriod(task.period)}
+                                        onBlur={(e) => {
+                                          const novoPeriod = e.target.value;
+                                          const updatedSub = { ...sub, period: novoPeriod };
+                                          updateSubTask(task._id, updatedSub);
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                    </div>
+                                    <div className="detail-item">
+                                      <span>
+                                        <strong>{t('guide')}</strong>
+                                      </span>
+                                      {sub?.guide ? (
+                                        <a
+                                          href={sub.guide}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                          }}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                        >
+                                          {t('viewPdf')}
+                                        </a>
+                                      ) : (
+                                        <span style={{ color: "gray", fontStyle: "italic", fontSize: "12px" }}>
+                                          {t('waitingGuide')}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="detail-item">
+                                      <span>
+                                        <strong>{t('upload')}</strong>
+                                      </span>
+                                      {sub?.guide ? (
+                                         <input
+                                          type="file"
+                                          name="guide"
+                                          onClick={(e) => e.stopPropagation()}
+                                          onChange={async (e) => {
+                                            e.stopPropagation();
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+
+                                            const formData = new FormData();
+                                            formData.append("file", file);
+                                            formData.append("taskId", task._id);
+
+                                            try {
+                                              const res = await fetch(`/api/tasks/subtask/${sub.payment_id}`, {
+                                                method: "PUT",
+                                                body: formData,
+                                              });
+
+                                              if (!res.ok) throw new Error("Erro no upload da subTask");
+
+                                              const data = await res.json();
+
+                                              updateSubTask(task._id, {
+                                                payment_id: sub.payment_id,
+                                                guide: "",
+                                                upload: data.fileUrl,
+                                                amount: sub.amount,
+                                              });
+                                            } catch (err) {
+                                              toast.error("Erro ao fazer upload da subTask");
+                                              console.error(err);
+                                            }
+                                          }}
+                                        />
+                                      ) : (
+                                        <span style={{ color: "gray", fontStyle: "italic", fontSize: "12px" }}>
+                                          {t('waitingGuide')}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </React.Fragment>
+                                ))}
+                              </div>
+                            )}
+                        </>
+                      )}
+                      {task.description && role === 'client' && (
+                        <div className="rejection-reason">
+                          <strong>{t('reasonForRejection')}</strong>
+                          <p>{task.description}</p>
+                        </div>
+                      )}
 
                     {role !== 'client' && (
-                      <div className="detail-grid-accountant">
-                        {task?.upload && (
-                          <>
-                            <div className="detail-item">
-                              <a href={task.upload} target="_blank" rel="noreferrer">
-                                <img src="/file-text.png" alt="" />
-                                <span>{formatFilename(task.upload)}</span>
-                              </a>
-                            </div>
-                            <button
-                              className="aprove-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleApprove(task._id);
-                              }}
-                            >
-                              <img src="/check.png" alt="" />
-                              <span>{t('approveFile')}</span>
-                            </button>
-                            <button
-                              className="reject-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRejectClick(task);
-                              }}
-                            >
-                              <img src="/check.png" alt="" />
-                              <span>{t('rejectFile')}</span>
-                            </button>
-                          </>
-                        )}
+                        <>
+                          {/* Grid principal do accountant */}
+                          <div className="detail-grid-accountant">
+                            {task?.upload && (
+                              <>
+                                <div className="detail-item">
+                                  <a href={task.upload} target="_blank" rel="noreferrer">
+                                    <img src="/file-text.png" alt="" />
+                                    <span>{formatFilename(task.upload)}</span>
+                                  </a>
+                                </div>
+                                <button
+                                  className="aprove-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleApprove(task._id);
+                                  }}
+                                >
+                                  <img src="/check.png" alt="" />
+                                  <span>{t('approveFile')}</span>
+                                </button>
+                                <button
+                                  className="reject-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRejectClick(task);
+                                  }}
+                                >
+                                  <img src="/check.png" alt="" />
+                                  <span>{t('rejectFile')}</span>
+                                </button>
+                              </>
+                            )}
 
-                        <div className="detail-item">
-                          <strong>{t('uploadGuide')}</strong>{" "}
-                          <input
-                            type="file"
-                            name="guide"
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => handleGuideUpload(e, task._id)}
-                          />
-                        </div>
-                        {task?.guide && (
-                          <div className="detail-item">
-                            <a href={task.guide} target="_blank" rel="noreferrer">
-                              {t('checkGuidePdf')}
-                            </a>
+                            <div className="detail-item">
+                              <strong>{t('uploadGuide')}</strong>{" "}
+                              <input
+                                type="file"
+                                name="guide"
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) => handleGuideUpload(e, task._id)}
+                              />
+                            </div>
+
+                            {task?.guide && (
+                              <div className="detail-item">
+                                <a href={task.guide} target="_blank" rel="noreferrer">
+                                  {t('checkGuidePdf')}
+                                </a>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Grid extra para subTasks */}
+                          {task?.subTasks?.length > 0 && (
+                          <div
+                            className="detail-grid-accountant"
+                            style={{ marginTop: "15px", borderTop: "1px solid #ddd", paddingTop: "10px" }}
+                          >
+                            {task.subTasks.map((sub: SubTask, index: number) => (
+                              <React.Fragment key={index}>
+                                {sub.upload && (
+                                  <>
+                                    <div className="detail-item">
+                                      <a href={sub.upload} target="_blank" rel="noreferrer">
+                                        <img src="/file-text.png" alt="" />
+                                        <span>{formatFilename(sub.upload)}</span>
+                                      </a>
+                                    </div>
+                                    <button
+                                      className="aprove-btn"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleApprove(sub.payment_id);
+                                      }}
+                                    >
+                                      <img src="/check.png" alt="" />
+                                      <span>{t('approveFile')}</span>
+                                    </button>
+                                    <button
+                                      className="reject-btn"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRejectClick(sub);
+                                      }}
+                                    >
+                                      <img src="/check.png" alt="" />
+                                      <span>{t('rejectFile')}</span>
+                                    </button>
+                                  </>
+                                )}
+
+                                <div className="detail-item">
+                                  <strong>{t('uploadGuide')}</strong>{" "}
+                                  <input
+                                    type="file"
+                                    name="guide"
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={async (e) => {
+                                      e.stopPropagation();
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+
+                                      const formData = new FormData();
+                                      formData.append("file", file);
+                                      formData.append("taskId", task._id);
+
+                                      try {
+                                        const res = await fetch(`/api/tasks/subtask/${sub.payment_id}`, {
+                                          method: "PUT",
+                                          body: formData,
+                                        });
+
+                                        if (!res.ok) throw new Error("Erro no upload da subTask");
+
+                                        const data = await res.json();
+
+                                        updateSubTask(task._id, {
+                                          payment_id: sub.payment_id,
+                                          guide: data.fileUrl,
+                                          upload: "",
+                                          amount: sub.amount,
+                                        });
+                                      } catch (err) {
+                                        toast.error("Erro ao fazer upload da subTask");
+                                        console.error(err);
+                                      }
+                                    }}
+                                  />
+                                </div>
+
+                                {sub?.guide && (
+                                  <div className="detail-item">
+                                    <a href={sub.guide} target="_blank" rel="noreferrer">
+                                      {t('checkGuidePdf')}
+                                    </a>
+                                  </div>
+                                )}
+                              </React.Fragment>
+                            ))}
                           </div>
                         )}
-                      </div>
+
+                      </>
                     )}
                   </div>
                 )}
@@ -606,7 +885,7 @@
             </div>
           ))}
 
-        {selectedTask && (
+        {selectedTask && "who" in selectedTask && "period" in selectedTask && (
           <RejectModal
             isOpen={modalOpen}
             onClose={() => {
@@ -614,8 +893,10 @@
               setSelectedTask(null);
             }}
             onSubmit={(reason) => handleRejectSubmit(reason)}
-            task={selectedTask}
-            clientName={clientNames[selectedTask.client_id ?? ""] ?? t('client')}
+            task={selectedTask as Task}
+            clientName={
+              clientNames[(selectedTask as Task).client_id ?? ""] ?? t('client')
+            }
           />
         )}
       </div>

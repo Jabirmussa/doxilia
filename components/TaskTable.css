@@ -8,8 +8,8 @@
   flex-direction: column;
   gap: 8px;
   padding-right: 10px;
-  max-width: 775px;
-  max-height: 550px;
+  max-width: 975px;
+  max-height: 95dvh;
   overflow-y: auto;
   @media screen and (min-width: 48rem) { 
      max-height: 400px;
