@@ -4,17 +4,15 @@ import Task from '@/models/Task';
 import fs from 'fs';
 import path from 'path';
 
-interface Context {
-  params: { payment_id: string };
-}
-
-export async function PUT(req: NextRequest, context: Context) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: { payment_id: string } }
+) {
   await connectDB();
 
-  try {
-    const params = await context.params; 
-    const { payment_id } = params;
+  const { payment_id } = context.params;
 
+  try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
 
@@ -22,7 +20,7 @@ export async function PUT(req: NextRequest, context: Context) {
       return NextResponse.json({ message: 'File not provided' }, { status: 400 });
     }
 
-    // Salvar arquivo
+    // Salva arquivo no servidor
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const filename = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
@@ -36,7 +34,7 @@ export async function PUT(req: NextRequest, context: Context) {
     fs.writeFileSync(filePath, buffer);
     const fileUrl = `/uploads/${filename}`;
 
-    // Atualizar subTask
+    // Atualiza a subTask
     const taskId = formData.get('taskId') as string;
     if (!taskId) {
       return NextResponse.json({ message: 'Task ID required' }, { status: 400 });
@@ -55,6 +53,7 @@ export async function PUT(req: NextRequest, context: Context) {
     }
 
     task.subTasks[subTaskIndex].upload = fileUrl;
+
     await task.save();
 
     return NextResponse.json({ message: 'SubTask upload updated', fileUrl });
