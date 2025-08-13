@@ -1,16 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
 import fs from 'fs';
 import path from 'path';
 
-export async function PUT(
-  req: NextRequest,
-  context: { params: { payment_id: string } }
-) {
+export async function PUT(req: NextRequest, context: any) {
   await connectDB();
 
-  const { payment_id } = context.params;
+  // aqui precisa de await porque params é um Promise
+  const { payment_id } = await context.params;
 
   try {
     const formData = await req.formData();
@@ -20,7 +19,7 @@ export async function PUT(
       return NextResponse.json({ message: 'File not provided' }, { status: 400 });
     }
 
-    // Salva arquivo no servidor
+    // Salvar arquivo
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const filename = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
@@ -34,7 +33,7 @@ export async function PUT(
     fs.writeFileSync(filePath, buffer);
     const fileUrl = `/uploads/${filename}`;
 
-    // Atualiza a subTask
+    // Atualizar subTask
     const taskId = formData.get('taskId') as string;
     if (!taskId) {
       return NextResponse.json({ message: 'Task ID required' }, { status: 400 });
@@ -48,12 +47,12 @@ export async function PUT(
     const subTaskIndex = task.subTasks.findIndex(
       (st: { payment_id: string }) => st.payment_id === payment_id
     );
+
     if (subTaskIndex === -1) {
       return NextResponse.json({ message: 'SubTask not found' }, { status: 404 });
     }
 
     task.subTasks[subTaskIndex].upload = fileUrl;
-
     await task.save();
 
     return NextResponse.json({ message: 'SubTask upload updated', fileUrl });
