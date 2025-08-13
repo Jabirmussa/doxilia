@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 type ContextType = {
   params: Promise<{
     id: string;
+    payment_id: string;
   }>;
 };
 
@@ -17,7 +18,7 @@ export async function PUT(req: NextRequest, context: ContextType) {
     const { reason } = await req.json();
 
     const updatedTask = await Task.findByIdAndUpdate(
-      params.id,
+      params.payment_id,
       {
         $set: {
           status: "OPEN",

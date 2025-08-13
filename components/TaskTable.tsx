@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-  /* eslint-disable @next/next/no-img-element */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  "use client";
-  import toast from "react-hot-toast";
-  import React, { useEffect, useState } from "react";
-  import { useLanguage } from "@/src/app/contexts/LanguageContext";
-  import { dictionaries } from "@/src/app/contexts/dictionaries";
-  import "./TaskTable.css";
-  import RejectModal from "@/components/RejectModal";
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+import toast from "react-hot-toast";
+import React, { useEffect, useState } from "react";
+import { useLanguage } from "@/src/app/contexts/LanguageContext";
+import { dictionaries } from "@/src/app/contexts/dictionaries";
+import "./TaskTable.css";
+import RejectModal from "@/components/RejectModal";
 import FeatherIcon from "./FeatherIcon";
 
   type Task = {
@@ -19,7 +20,7 @@ import FeatherIcon from "./FeatherIcon";
     what: string;
     due_date: string;
     payment_id: string;
-    amount: string;
+    amount: number;
     period: string;
     guide?: string;
     upload?: string;
@@ -35,15 +36,14 @@ import FeatherIcon from "./FeatherIcon";
     guide?: string;
   }
 
-
   type TaskTableProps = {
     type: "client" | "accountant";
     onNavigate?: (screen: string) => void;
   };
 
   type Props = {
-  onNavigate: (screen: string) => void;
-};
+    onNavigate: (screen: string) => void;
+  };
 
 
   const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
@@ -66,6 +66,8 @@ import FeatherIcon from "./FeatherIcon";
     const [clientNames, setClientNames] = useState<{ [key: string]: string }>({});
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | SubTask | null>(null);
+    const [paymentInput, setPaymentInput] = useState<{ [key: string]: string }>({});
+    const [amountInput, setAmountInput] = useState<{ [key: string]: number }>({});
     const [search, setSearch] = useState('');
 
     useEffect(() => {
@@ -239,7 +241,6 @@ import FeatherIcon from "./FeatherIcon";
       }
     };
 
-
     const handleGuideUpload = async (
       e: React.ChangeEvent<HTMLInputElement>,
       taskId: string
@@ -287,7 +288,6 @@ import FeatherIcon from "./FeatherIcon";
         console.error(err);
       }
     };
-
 
     const handleApprove = async (taskId: string) => {
       try {
@@ -422,6 +422,70 @@ import FeatherIcon from "./FeatherIcon";
       }
     };
 
+    const handlePaymentIdChange = (e: React.ChangeEvent<HTMLInputElement>, taskId: string) => {
+      const { value } = e.target;
+      updateSubTask(taskId, {
+        payment_id: value,
+        upload: "",
+        amount: 0
+      });
+    };
+
+    const handleAddPaymentId = async (taskId: string) => {
+      const paymentId = paymentInput[taskId];
+      if (!paymentId) return;
+
+      try {
+        const res = await fetch(`/api/tasks/${taskId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ payment_id: paymentId }),
+        });
+
+        if (!res.ok) throw new Error("Erro ao atualizar Payment ID");
+
+        setTasks((prev) =>
+          prev.map((task) =>
+            task._id === taskId ? { ...task, payment_id: paymentId } : task
+          )
+        );
+
+        toast.success("Payment ID atualizado com sucesso!");
+      } catch (err: any) {
+        toast.error(err.message || "Erro desconhecido");
+      }
+    };
+
+    const handleAddAmount = async (taskId: string) => {
+      const amount = amountInput[taskId];
+      if (amount === undefined || amount === null) return;
+
+      try {
+        const res = await fetch(`/api/tasks/${taskId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ amount: Number(amount) }), // 👈 envia como objeto e garante número
+        });
+
+        if (!res.ok) throw new Error("Erro ao atualizar Amount");
+
+        setTasks((prev) =>
+          prev.map((task) =>
+            task._id === taskId ? { ...task, amount: Number(amount) } : task
+          )
+        );
+
+        toast.success("Amount atualizado com sucesso!");
+      } catch (err: any) {
+        toast.error(err.message || "Erro desconhecido");
+      }
+    };
+
+
     return (
       <div className="task-list">
         <div className="client-list-header">
@@ -524,17 +588,23 @@ import FeatherIcon from "./FeatherIcon";
                             <div className="detail-item">
                               <span className="payment-id">
                                 <strong>{t('paymentId')}</strong>
-                                <img
-                                  className="copy"
-                                  src="/copy.png"
-                                  alt="copy-png"
-                                  style={{ cursor: "pointer", marginLeft: "8px" }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    copyToClipboard(task.payment_id);
-                                  }}
-                                  title={t('copyPaymentId')}
-                                />
+                                {task.payment_id ? (
+                                  <img
+                                    className="copy"
+                                    src="/copy.png"
+                                    alt="copy-png"
+                                    style={{ cursor: "pointer", marginLeft: "8px" }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      copyToClipboard(task.payment_id);
+                                    }}
+                                    title={t('copyPaymentId')}
+                                  />
+                                ) : (
+                                  <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
+                                    {t('waitingPaymentId')}
+                                  </span>
+                                )}
                               </span>
                               <span>{task.payment_id}</span>
                             </div>
@@ -542,7 +612,7 @@ import FeatherIcon from "./FeatherIcon";
                               <span>
                                 <strong>{t('amount')}</strong>
                               </span>
-                              <span>{task.amount}.00 mzn</span>
+                              {Number(task.amount) !== 0 ? <span>{task.amount}.00 mzn</span> : <span>{t('waitingAmount...')}</span>}
                             </div>
                             <div className="detail-item">
                               <span>
@@ -584,14 +654,14 @@ import FeatherIcon from "./FeatherIcon";
                                     {t('chooseFile')}
                                     <FeatherIcon name="upload" />
                                   </div>
-                                  <a
+                                  {/* <a
                                     href={task.upload}
                                     onClick={(e) => { e.stopPropagation(); }}
                                     target="_blank"
                                     rel="noreferrer"
                                   >
                                     {t('popPdf')}
-                                  </a>
+                                  </a> */}
                                 </>
                               ) : (
                                 <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
@@ -600,7 +670,6 @@ import FeatherIcon from "./FeatherIcon";
                               )}
                             </div>
                           </div>
-
                           {task?.subTasks?.length > 0 && (
                               <div
                                 className="detail-grid"
@@ -610,17 +679,23 @@ import FeatherIcon from "./FeatherIcon";
                                     <div className="detail-item">
                                       <span className="payment-id">
                                         <strong>{t('paymentId')}</strong>
-                                        <img
-                                          className="copy"
-                                          src="/copy.png"
-                                          alt="copy-png"
-                                          style={{ cursor: "pointer", marginLeft: "8px" }}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            copyToClipboard(sub.payment_id);
-                                          }}
-                                          title={t('copyPaymentId')}
-                                        />
+                                        {sub.payment_id ? (
+                                          <img
+                                            className="copy"
+                                            src="/copy.png"
+                                            alt="copy-png"
+                                            style={{ cursor: "pointer", marginLeft: "8px" }}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              copyToClipboard(sub.payment_id);
+                                            }}
+                                            title={t('copyPaymentId')}
+                                          />
+                                        ) : (
+                                          <span style={{ color: "gray", fontStyle: "italic", fontSize: '12px' }}>
+                                            {t('waitingPaymentId')}
+                                          </span>
+                                        )}
                                       </span>
                                       <span>{sub.payment_id}</span>
                                     </div>
@@ -763,26 +838,79 @@ import FeatherIcon from "./FeatherIcon";
                               </>
                             )}
 
-                            <div className="detail-item">
-                              <strong>{t('uploadGuide')}</strong>{" "}
-                              <div className="upload-icon-item">
-                                <FeatherIcon name="upload" />
-                                <input
-                                  type="file"
-                                  name="guide"
-                                  onClick={(e) => e.stopPropagation()}
-                                  onChange={(e) => handleGuideUpload(e, task._id)}
-                                />
-                              </div>
-                            </div>
-
-                            {task?.guide && (
                               <div className="detail-item">
-                                <a href={task.guide} target="_blank" rel="noreferrer">
-                                  {t('checkGuidePdf')}
-                                </a>
+                                <strong>{t('paymentId')}</strong>{" "}
+                                {task.payment_id ? (
+                                  <span>{task.payment_id}</span>
+                                ) : (
+                                  <div className="upload-icon">
+                                    <input
+                                      type="text"
+                                      name="paymentId"
+                                      placeholder="type payment ID"
+                                      value={paymentInput[task._id] || ""}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) =>
+                                        setPaymentInput((prev) => ({ ...prev, [task._id]: e.target.value }))
+                                      }
+                                    />
+                                    <span
+                                      style={{ cursor: "pointer", display: "inline-flex" }}
+                                      onClick={() => handleAddPaymentId(task._id)}
+                                    >
+                                      <FeatherIcon name="plus" />
+                                    </span>
+                                  </div>
+                                )}
                               </div>
-                            )}
+
+                              <div className="detail-item">
+                                <strong>{t('amount')}</strong>{" "}
+                                {task.amount ? (
+                                  <span>{task.amount} mzn</span>
+                                ) : (
+                                  <div className="upload-icon">
+                                    <input
+                                      type="number"
+                                      name="amount"
+                                      placeholder="Type amount"
+                                      value={amountInput[task._id] || ""}
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) =>
+                                        setAmountInput((prev) => ({ ...prev, [task._id]: Number(e.target.value) }))
+                                      }
+                                    />
+                                    <span
+                                      style={{ cursor: "pointer", display: "inline-flex" }}
+                                      onClick={() => handleAddAmount(task._id)}
+                                    >
+                                      <FeatherIcon name="plus" />
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                                {!task.guide &&(
+                                  <div className="detail-item">
+                                    <strong>{t('uploadGuide')}</strong>{" "}
+                                    <div className="upload-icon-item">
+                                      <FeatherIcon name="upload" />
+                                      <input
+                                        type="file"
+                                        name="guide"
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={(e) => handleGuideUpload(e, task._id)}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+
+                              {task?.guide && (
+                                <div className="detail-item">
+                                  <a href={task.guide} target="_blank" rel="noreferrer">
+                                    {t('checkGuidePdf')}
+                                  </a>
+                                </div>
+                              )}
                           </div>
 
                           {/* Grid extra para subTasks */}
@@ -823,48 +951,49 @@ import FeatherIcon from "./FeatherIcon";
                                     </button>
                                   </>
                                 )}
+                                {!task.guide &&(
+                                  <div className="detail-item">
+                                    <strong>{t('uploadGuide')}</strong>{" "}
+                                    <div className="upload-icon-item">
+                                      <FeatherIcon name="upload" />
+                                      <input
+                                        type="file"
+                                        name="guide"
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={async (e) => {
+                                          e.stopPropagation();
+                                          const file = e.target.files?.[0];
+                                          if (!file) return;
 
-                                <div className="detail-item">
-                                  <strong>{t('uploadGuide')}</strong>{" "}
-                                  <div className="upload-icon-item">
-                                    <FeatherIcon name="upload" />
-                                    <input
-                                      type="file"
-                                      name="guide"
-                                      onClick={(e) => e.stopPropagation()}
-                                      onChange={async (e) => {
-                                        e.stopPropagation();
-                                        const file = e.target.files?.[0];
-                                        if (!file) return;
+                                          const formData = new FormData();
+                                          formData.append("file", file);
+                                          formData.append("taskId", task._id);
 
-                                        const formData = new FormData();
-                                        formData.append("file", file);
-                                        formData.append("taskId", task._id);
+                                          try {
+                                            const res = await fetch(`/api/tasks/subtask/${sub.payment_id}`, {
+                                              method: "PUT",
+                                              body: formData,
+                                            });
 
-                                        try {
-                                          const res = await fetch(`/api/tasks/subtask/${sub.payment_id}`, {
-                                            method: "PUT",
-                                            body: formData,
-                                          });
+                                            if (!res.ok) throw new Error("Erro no upload da subTask");
 
-                                          if (!res.ok) throw new Error("Erro no upload da subTask");
+                                            const data = await res.json();
 
-                                          const data = await res.json();
-
-                                          updateSubTask(task._id, {
-                                            payment_id: sub.payment_id,
-                                            guide: data.fileUrl,
-                                            upload: "",
-                                            amount: sub.amount,
-                                          });
-                                        } catch (err) {
-                                          toast.error("Erro ao fazer upload da subTask");
-                                          console.error(err);
-                                        }
-                                      }}
-                                    />
+                                            updateSubTask(task._id, {
+                                              payment_id: sub.payment_id,
+                                              guide: data.fileUrl,
+                                              upload: "",
+                                              amount: sub.amount,
+                                            });
+                                          } catch (err) {
+                                            toast.error("Erro ao fazer upload da subTask");
+                                            console.error(err);
+                                          }
+                                        }}
+                                      />
+                                    </div>
                                   </div>
-                                </div>
+                                )}
 
                                 {sub?.guide && (
                                   <div className="detail-item">
@@ -877,7 +1006,6 @@ import FeatherIcon from "./FeatherIcon";
                             ))}
                           </div>
                         )}
-
                       </>
                     )}
                   </div>

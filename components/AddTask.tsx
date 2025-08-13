@@ -54,9 +54,9 @@ export default function AddTask() {
   const periodInputRef = useRef<HTMLInputElement>(null);
   const [whoQuantity, setWhoQuantity] = useState(1);
   const [subTasks, setSubTasks] = useState<
-    { amount: string; payment_id: string; guide?: File | null }[]
+    { amount: string; payment_id: string; guide?: File | null; upload?: File | null }[]
   >(
-    Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: null }))
+    Array.from({ length: whoQuantity }, () => ({ amount: "", payment_id: "", guide: null, upload: null }))
   );
 
 
@@ -263,7 +263,6 @@ export default function AddTask() {
             value={formData.amount}
             onChange={handleChange}
             className={styles.inputItem}
-            required
           />
 
           <label>{t("dueDate")}</label>
@@ -306,7 +305,6 @@ export default function AddTask() {
             value={formData.payment_id}
             onChange={handleChange}
             className={styles.inputItem}
-            required
           />
         </div>
 

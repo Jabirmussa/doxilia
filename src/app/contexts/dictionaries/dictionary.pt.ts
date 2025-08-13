@@ -89,5 +89,6 @@ export const dictionary = {
   quantityOfIRPS: "Quantidade de IRPS",
   quantityOfIRPC: "Quantidade de IRPC",
   searchInTasks: "Pesquisar por tarefas",
-  chooseFile: "Escolher Ficheiro",
+  chooseFile: "Escolher File",
+  waitingAmount: "Aguardando valor...",
 };

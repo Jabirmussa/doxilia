@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prefer-const */
 
 import { connectDB } from '@/lib/mongodb';
 import Task from '@/models/Task';
@@ -21,14 +23,25 @@ export async function POST(req: Request) {
     const status = formData.get('status');
     const client_id = formData.get('client_id');
     const accountant_id = formData.get('accountant_id');
-    const amount = parseFloat(formData.get('amount') as string);
+
+    // Trata o amount principal
+    let amountRaw = formData.get('amount') as string | null;
+    let amount: number | null = null;
+
+    if (amountRaw !== null && amountRaw.trim() !== '') {
+      const parsed = parseFloat(amountRaw);
+      amount = isNaN(parsed) ? 0 : parsed;
+    } else {
+      amount = 0; // ou null se preferir
+    }
+
     const period = formData.get('period');
     const due_date = formData.get('due_date');
     const what = formData.get('what');
     const who = formData.get('who');
-    const payment_id = formData.get('payment_id') || '';
+    const payment_id = formData.get('payment_id');
 
-    // função utilitária pra salvar arquivos
+    // Função para salvar arquivos
     const saveFile = async (file: File): Promise<string> => {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -45,27 +58,33 @@ export async function POST(req: Request) {
       return `/uploads/${filename}`;
     };
 
-    // Validação de campos obrigatórios
+    // Validação de campos obrigatórios (exceto amount)
     if (!status || !client_id || !accountant_id || !period || !due_date || !what || !who) {
       return NextResponse.json({
         message: 'Missing required fields!',
       }, { status: 400 });
     }
 
-    // Arquivos gerais (não relacionados a subtasks)
+    // Arquivos gerais
     const guideFile = formData.get('guide') as File | null;
     const uploadFile = formData.get('upload') as File | null;
 
     const guideUrl = guideFile ? await saveFile(guideFile) : '';
     const uploadUrl = uploadFile ? await saveFile(uploadFile) : '';
 
-    // Monta as subtasks (para IRPS)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Monta subtasks (IRPS)
     const subTasks: any[] = [];
     if (who === 'IRPS') {
       let idx = 0;
       while (formData.has(`subTasks[${idx}][amount]`)) {
-        const stAmount = parseFloat(formData.get(`subTasks[${idx}][amount]`) as string);
+        const rawSubAmount = formData.get(`subTasks[${idx}][amount]`) as string;
+        let stAmount: number = 0;
+
+        if (rawSubAmount && rawSubAmount.trim() !== '') {
+          const parsed = parseFloat(rawSubAmount);
+          stAmount = isNaN(parsed) ? 0 : parsed;
+        }
+
         const stPaymentId = formData.get(`subTasks[${idx}][payment_id]`) as string;
 
         let stGuideUrl = '';
@@ -131,6 +150,7 @@ export async function POST(req: Request) {
     }, { status: 500 });
   }
 }
+
 
 
 

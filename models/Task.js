@@ -11,7 +11,7 @@ const taskSchema = new Schema({
   status: { type: String, required: true },
   client_id: { type: String, required: true },
   accountant_id: { type: String, required: true },
-  amount: { type: Number, required: true },
+  amount: { type: Number, default: 0 },
   period: { type: String, required: true },
   due_date: { type: String, required: true },
   what: { type: String, required: true },

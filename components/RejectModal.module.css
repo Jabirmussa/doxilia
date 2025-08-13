@@ -12,6 +12,10 @@
   align-items: center;
   z-index: 9999;
   overflow: hidden;
+  
+  form{
+    padding: 0;
+  }
 }
 
 .modalContent {
@@ -81,3 +85,4 @@
 .modalActions button:hover {
   opacity: 0.85;
 }
+

@@ -8,7 +8,6 @@ import path from 'path';
 export async function PUT(req: NextRequest, context: any) {
   await connectDB();
 
-  // aqui precisa de await porque params é um Promise
   const { payment_id } = await context.params;
 
   try {
