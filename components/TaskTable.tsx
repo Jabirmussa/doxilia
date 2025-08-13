@@ -8,6 +8,7 @@
   import { dictionaries } from "@/src/app/contexts/dictionaries";
   import "./TaskTable.css";
   import RejectModal from "@/components/RejectModal";
+import FeatherIcon from "./FeatherIcon";
 
   type Task = {
     subTasks: SubTask[];
@@ -573,12 +574,16 @@
                               <strong>{t('upload')}</strong>{" "}
                               {task?.guide ? (
                                 <>
-                                  <input
-                                    type="file"
-                                    name="uploadLink"
-                                    onClick={(e) => e.stopPropagation()}
-                                    onChange={(e) => handleUpload(e, task._id)}
-                                  />
+                                  <div className="upload-icon-item">
+                                    <input
+                                      type="file"
+                                      name="uploadLink"
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={(e) => handleUpload(e, task._id)}
+                                    />
+                                    {t('chooseFile')}
+                                    <FeatherIcon name="upload" />
+                                  </div>
                                   <a
                                     href={task.upload}
                                     onClick={(e) => { e.stopPropagation(); }}
@@ -668,6 +673,8 @@
                                         <strong>{t('upload')}</strong>
                                       </span>
                                       {sub?.guide ? (
+                                        <div className="upload-icon-item">
+                                          <FeatherIcon name="upload" />
                                          <input
                                           type="file"
                                           name="guide"
@@ -701,8 +708,8 @@
                                               toast.error("Erro ao fazer upload da subTask");
                                               console.error(err);
                                             }
-                                          }}
-                                        />
+                                          }} />
+                                        </div>
                                       ) : (
                                         <span style={{ color: "gray", fontStyle: "italic", fontSize: "12px" }}>
                                           {t('waitingGuide')}
