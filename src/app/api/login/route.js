@@ -43,7 +43,8 @@ export async function POST(req) {
       {
         id: user._id,
         email: user.email,
-        role: userType
+        role: userType,
+        language: user.language
       },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -60,7 +61,7 @@ export async function POST(req) {
       sameSite: 'lax',
     });
 
-    return new Response(JSON.stringify({ message: 'Login ok', userType, userId: user._id }), {
+    return new Response(JSON.stringify({ message: 'Login ok', userType, userId: user._id, language: user.language }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

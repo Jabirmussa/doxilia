@@ -36,6 +36,7 @@ export default function Index() {
 
 
      const data = await res.json();
+    //  console.log(data);
       toast.success('Login successful!');
 
       localStorage.setItem('role', data.userType);
@@ -51,7 +52,7 @@ export default function Index() {
         localStorage.setItem('user_id', data.userId);
       }
 
-      console.log(data.userId)
+      // console.log(data.userId);
 
       if (data.userType === 'admin') window.location.href = '/admin';
       else if (data.userType === 'client') window.location.href = '/client';
