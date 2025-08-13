@@ -766,12 +766,15 @@ import FeatherIcon from "./FeatherIcon";
 
                             <div className="detail-item">
                               <strong>{t('uploadGuide')}</strong>{" "}
-                              <input
-                                type="file"
-                                name="guide"
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => handleGuideUpload(e, task._id)}
-                              />
+                              <div className="upload-icon-item">
+                                <FeatherIcon name="upload" />
+                                <input
+                                  type="file"
+                                  name="guide"
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) => handleGuideUpload(e, task._id)}
+                                />
+                              </div>
                             </div>
 
                             {task?.guide && (
