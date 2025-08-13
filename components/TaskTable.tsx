@@ -824,41 +824,44 @@ import FeatherIcon from "./FeatherIcon";
 
                                 <div className="detail-item">
                                   <strong>{t('uploadGuide')}</strong>{" "}
-                                  <input
-                                    type="file"
-                                    name="guide"
-                                    onClick={(e) => e.stopPropagation()}
-                                    onChange={async (e) => {
-                                      e.stopPropagation();
-                                      const file = e.target.files?.[0];
-                                      if (!file) return;
+                                  <div className="upload-icon-item">
+                                    <FeatherIcon name="upload" />
+                                    <input
+                                      type="file"
+                                      name="guide"
+                                      onClick={(e) => e.stopPropagation()}
+                                      onChange={async (e) => {
+                                        e.stopPropagation();
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
 
-                                      const formData = new FormData();
-                                      formData.append("file", file);
-                                      formData.append("taskId", task._id);
+                                        const formData = new FormData();
+                                        formData.append("file", file);
+                                        formData.append("taskId", task._id);
 
-                                      try {
-                                        const res = await fetch(`/api/tasks/subtask/${sub.payment_id}`, {
-                                          method: "PUT",
-                                          body: formData,
-                                        });
+                                        try {
+                                          const res = await fetch(`/api/tasks/subtask/${sub.payment_id}`, {
+                                            method: "PUT",
+                                            body: formData,
+                                          });
 
-                                        if (!res.ok) throw new Error("Erro no upload da subTask");
+                                          if (!res.ok) throw new Error("Erro no upload da subTask");
 
-                                        const data = await res.json();
+                                          const data = await res.json();
 
-                                        updateSubTask(task._id, {
-                                          payment_id: sub.payment_id,
-                                          guide: data.fileUrl,
-                                          upload: "",
-                                          amount: sub.amount,
-                                        });
-                                      } catch (err) {
-                                        toast.error("Erro ao fazer upload da subTask");
-                                        console.error(err);
-                                      }
-                                    }}
-                                  />
+                                          updateSubTask(task._id, {
+                                            payment_id: sub.payment_id,
+                                            guide: data.fileUrl,
+                                            upload: "",
+                                            amount: sub.amount,
+                                          });
+                                        } catch (err) {
+                                          toast.error("Erro ao fazer upload da subTask");
+                                          console.error(err);
+                                        }
+                                      }}
+                                    />
+                                  </div>
                                 </div>
 
                                 {sub?.guide && (
