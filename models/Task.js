@@ -14,7 +14,7 @@ const taskSchema = new Schema({
   amount: { type: Number, default: 0 },
   period: { type: String, required: true },
   due_date: { type: String, required: true },
-  what: { type: String, required: true },
+  // what: { type: String, required: true },
   who: { type: String, required: true },
   payment_id: { type: String, default: '' },
   guide: { type: String, default: '' },

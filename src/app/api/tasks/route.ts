@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     const period = formData.get('period');
     const due_date = formData.get('due_date');
-    const what = formData.get('what');
+    // const what = formData.get('what');
     const who = formData.get('who');
     const payment_id = formData.get('payment_id');
 
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     };
 
     // Validação de campos obrigatórios (exceto amount)
-    if (!status || !client_id || !accountant_id || !period || !due_date || !what || !who) {
+    if (!status || !client_id || !accountant_id || !period || !due_date || !who) {
       return NextResponse.json({
         message: 'Missing required fields!',
       }, { status: 400 });
@@ -111,7 +111,7 @@ export async function POST(req: Request) {
       amount,
       period,
       due_date,
-      what,
+      // what,
       who,
       payment_id,
       guide: guideUrl,
@@ -127,7 +127,7 @@ export async function POST(req: Request) {
         await Notification.create({
           user_id: client_id,
           role: 'client',
-          message: `You have a new task: "${what}".`,
+          message: `You have a new task: "${who}".`,
         });
       }
 
@@ -135,7 +135,7 @@ export async function POST(req: Request) {
         await Notification.create({
           user_id: accountant_id,
           role: 'accountant',
-          message: `A new task "${what}" was assigned.`,
+          message: `A new task "${who}" was assigned.`,
         });
       }
     } catch (notifErr) {
@@ -222,7 +222,7 @@ export async function PUT(req: Request) {
       amount,
       period,
       due_date,
-      what,
+      // what,
       who,
       payment_id,
       guide,
@@ -245,7 +245,7 @@ export async function PUT(req: Request) {
     if (amount !== undefined) task.amount = amount;
     if (period) task.period = period;
     if (due_date) task.due_date = due_date;
-    if (what) task.what = what;
+    // if (what) task.what = what;
     if (who) task.who = who;
     if (payment_id) task.payment_id = payment_id;
     if (guide) task.guide = guide;

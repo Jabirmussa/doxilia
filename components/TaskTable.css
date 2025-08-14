@@ -39,6 +39,9 @@
   display: none;
   @media screen and (min-width: 48rem) { 
     display: flex;
+    span:first-child{
+      width: 140px;
+    }
   }
 }
 
@@ -126,6 +129,9 @@
   font-weight: bold;
   display: flex;
   align-self: center;
+  @media screen and (min-width: 48rem) { 
+    width: 153px;
+  }
 }
 .status-dot {
   width: 20px;

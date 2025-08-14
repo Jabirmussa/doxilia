@@ -25,7 +25,7 @@ interface FormDataState {
   amount: string;
   period: string;
   due_date: string;
-  what: string;
+  // what: string;
   who: string;
   whoCustom?: string;
   payment_id: string;
@@ -35,7 +35,6 @@ interface FormDataState {
     guide?: string;
     due_date?: string;
     period?: string;
-    what?: string;
   }[];
 }
 
@@ -67,7 +66,7 @@ export default function AddTask() {
     amount: "",
     period: "",
     due_date: "",
-    what: "",
+    // what: "",
     who: "",
     payment_id: "",
     subTasks: [],
@@ -121,7 +120,7 @@ export default function AddTask() {
   function handleWhoQuantityChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = Math.max(1, Number(e.target.value));
     setWhoQuantity(value);
-    setSubTasks(Array.from({ length: value }, () => ({ amount: "", payment_id: "", due_date: "", period: "", what: "" })));
+    setSubTasks(Array.from({ length: value }, () => ({ amount: "", payment_id: "", due_date: "", period: ""})));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -192,7 +191,7 @@ export default function AddTask() {
         amount: "",
         period: "",
         due_date: "",
-        what: "",
+        // what: "",
         who: "INSS",
         payment_id: "",
         subTasks: [],
@@ -296,16 +295,6 @@ export default function AddTask() {
             </span>
 
           </div>
-
-
-          <label>{t("paymentId")}</label>
-          <input
-            type="text"
-            name="payment_id"
-            value={formData.payment_id}
-            onChange={handleChange}
-            className={styles.inputItem}
-          />
         </div>
 
         <div className={styles.column}>
@@ -341,7 +330,7 @@ export default function AddTask() {
             </span>
 
           </div>
-          <label>{t("who")}</label>
+          <label>{t("type")}</label>
           {formData.who === "custom" ? (
             <input
               type="text"
@@ -430,7 +419,7 @@ export default function AddTask() {
           )}
 
 
-          <label>{t("what")}</label>
+          {/* <label>{t("what")}</label>
           <input
             type="text"
             name="what"
@@ -438,7 +427,7 @@ export default function AddTask() {
             onChange={handleChange}
             className={styles.inputItem}
             required
-          />
+          /> */}
 
           <label>{t("guide")} (PDF)</label>
           <input
@@ -446,6 +435,14 @@ export default function AddTask() {
             name="guide"
             accept="application/pdf"
             onChange={handleFileChange}
+            className={styles.inputItem}
+          />
+          <label>{t("paymentId")}</label>
+          <input
+            type="text"
+            name="payment_id"
+            value={formData.payment_id}
+            onChange={handleChange}
             className={styles.inputItem}
           />
 

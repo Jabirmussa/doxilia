@@ -333,16 +333,16 @@ import FeatherIcon from "./FeatherIcon";
       setModalOpen(true);
     };
 
-    const handleRejectSubmit = async (reason: string) => {
+    const handleRejectSubmit = async (taskId: string, reason: string) => {
       if (!selectedTask) return;
 
       try {
-        const res = await fetch(`/api/tasks/reject/${selectedTask.payment_id}`, {
+        const res = await fetch(`/api/tasks/reject/${taskId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ reason, status: "OPEN" }),
+          body: JSON.stringify({ reason }),
         });
 
         if (!res.ok) throw new Error("Erro ao rejeitar");
@@ -351,7 +351,9 @@ import FeatherIcon from "./FeatherIcon";
 
         setTasks((prev) =>
           prev.map((t) =>
-            t.payment_id === selectedTask.payment_id ? { ...t, status: "OPEN", description: reason } : t
+            t._id === taskId
+              ? { ...t, status: "UPLOAD NEW FILE", description: reason }
+              : t
           )
         );
       } catch (err) {
@@ -359,6 +361,7 @@ import FeatherIcon from "./FeatherIcon";
         console.error(err);
       }
     };
+
 
     const handleDelete = async (taskId: string) => {
       const confirmDelete = window.confirm("Tem certeza que deseja deletar esta task?");
@@ -511,9 +514,9 @@ import FeatherIcon from "./FeatherIcon";
           <span>{t('status')}</span>
           {role === 'accountant' && (<span>{t('client')}</span>)}
           <span>{t('dueDate')}</span>
-          <span>{t('what')}</span>
-          <span>{t('who')}</span>
-          <span>{t('action')}</span>
+          {/* <span>{t('what')}</span> */}
+          <span>{t('type')}</span>
+          <span style={{ textAlign: 'right', opacity: 0 }}>{t('action')}</span>
         </div>
 
         {[...tasks]
@@ -554,14 +557,28 @@ import FeatherIcon from "./FeatherIcon";
                           : "upcoming"
                       }`}
                     >
-                      {task.status.toUpperCase()}
+                      { 
+                        task.status.toLowerCase() === "upcoming"
+                        ? "Draft"
+                        : task.status.toLowerCase() === "open"
+                        ? role === "accountant"
+                          ? "Waiting Client"
+                          : "Make Payment"
+                        : task.status.toLowerCase() === "close"
+                        ? "closed"
+                        : task.status.toLowerCase() === "checking"
+                        ? role === "accountant"
+                          ? "Checking File"
+                          : "Waiting Acc"
+                        : task.status
+                      }
                     </span>
                   </span>
                   {role !== 'client' && (
                     <span>{clientNames[task.client_id ?? ""] ?? t('loading')}</span>
                   )}
                   <span><TaskDate dateString={task.due_date} /></span>
-                  <span>{task.what}</span>
+                  {/* <span>{task.what}</span> */}
                   <span>{task.who}</span>
                   <span className="toggle-span">
                     <button
@@ -1032,7 +1049,7 @@ import FeatherIcon from "./FeatherIcon";
               setModalOpen(false);
               setSelectedTask(null);
             }}
-            onSubmit={(reason) => handleRejectSubmit(reason)}
+            onSubmit={(reason) => handleRejectSubmit(selectedTask._id, reason)}
             task={selectedTask as Task}
             clientName={
               clientNames[(selectedTask as Task).client_id ?? ""] ?? t('client')

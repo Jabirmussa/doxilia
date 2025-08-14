@@ -83,4 +83,5 @@ export const dictionary = {
   searchInTasks: "Search in tasks",
   chooseFile: "Choose File",
   waitingAmount: "Waiting for amount...",
+  type: "Type",
 };

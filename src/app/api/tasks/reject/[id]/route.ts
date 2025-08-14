@@ -1,27 +1,29 @@
-import { connectDB } from "@/lib/mongodb";
-import Task from "@/models/Task";
-import Notification from "@/models/Notification";
-import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from '@/lib/mongodb';
+import Task from '@/models/Task';
+import Notification from '@/models/Notification';
+import { NextRequest, NextResponse } from 'next/server';
 
-type ContextType = {
-  params: Promise<{
-    id: string;
-    payment_id: string;
-  }>;
+type Context = {
+  params: Promise<{ id: string }>;
 };
 
-export async function PUT(req: NextRequest, context: ContextType) {
+export async function PUT(req: NextRequest, context: Context) {
   await connectDB();
 
   try {
-    const params = await context.params; // await aqui, porque é Promise
+    const params = await context.params; // await aqui
+    const { id } = params;
     const { reason } = await req.json();
 
+    if (!reason) {
+      return NextResponse.json({ error: "Missing reason" }, { status: 400 });
+    }
+
     const updatedTask = await Task.findByIdAndUpdate(
-      params.payment_id,
+      id,
       {
         $set: {
-          status: "OPEN",
+          status: "UPLOAD NEW FILE",
           description: reason,
           upload: "",
         },
@@ -41,9 +43,12 @@ export async function PUT(req: NextRequest, context: ContextType) {
       });
     }
 
-    return NextResponse.json({ message: "Rejeição registrada", task: updatedTask });
+    return NextResponse.json({
+      message: "Rejeição registrada",
+      task: updatedTask,
+    });
   } catch (err) {
     console.error("Erro ao rejeitar task:", err);
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
