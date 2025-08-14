@@ -512,11 +512,11 @@ import FeatherIcon from "./FeatherIcon";
         </div>
         <div className="task-header">
           <span>{t('status')}</span>
-          {role === 'accountant' && (<span>{t('client')}</span>)}
+          {role !== 'client' && (<span>{t('client')}</span>)}
           <span>{t('dueDate')}</span>
           {/* <span>{t('what')}</span> */}
           <span>{t('type')}</span>
-          <span style={{ textAlign: 'right', opacity: 0 }}>{t('action')}</span>
+          <span style={{ opacity: 0 }}>{t('action')}</span>
         </div>
 
         {[...tasks]
@@ -1029,7 +1029,7 @@ import FeatherIcon from "./FeatherIcon";
                 )}
               </div>
 
-              {role !== 'client' && (
+              {role === 'admin' && (
                 <div className="task-trash"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1037,6 +1037,7 @@ import FeatherIcon from "./FeatherIcon";
                   }}
                 >
                   {/* ícone lixeira */}
+                  <FeatherIcon name="trash-2" />
                 </div>
               )}
             </div>
