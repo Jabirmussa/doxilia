@@ -235,6 +235,10 @@
         background: transparent;
         width: auto;
       }
+      span svg{
+        width: 1rem;
+        height: 1rem;
+      }
     }
     strong{
       text-transform: uppercase;
@@ -254,20 +258,14 @@
 }
 
 .aprove-btn, .reject-btn{
-  padding: 10px;
-  border-radius: 10px;
-  color: #fff;
   span{
     padding-left: 10px;
   }
-}
-
-.aprove-btn{
-  background-color: var(--green-bg);
-}
-
-.reject-btn{
-  background-color: var(--red-bg);
+  text-decoration: underline;
+  svg{
+    width: 1rem;
+    height: 1rem;
+  }
 }
 
 .task-desc {

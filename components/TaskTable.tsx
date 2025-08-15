@@ -824,37 +824,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
                     <>
                       {/* Grid principal do accountant */}
                       <div className="detail-grid-accountant">
-                        {task?.upload && (
-                          <>
-                            <div className="detail-item">
-                              <a href={task.upload} target="_blank" rel="noreferrer">
-                                <img src="/file-text.png" alt="" />
-                                <span>{formatFilename(task.upload)}</span>
-                              </a>
-                            </div>
-                            <button
-                              className="aprove-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleApprove(task._id);
-                              }}
-                            >
-                              <img src="/check.png" alt="" />
-                              <span>{t('approveFile')}</span>
-                            </button>
-                            <button
-                              className="reject-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRejectClick(task);
-                              }}
-                            >
-                              <img src="/check.png" alt="" />
-                              <span>{t('rejectFile')}</span>
-                            </button>
-                          </>
-                        )}
-
+                      
                           <div className="detail-item">
                             <strong>{t('paymentId')}</strong>{" "}
                             {task.payment_id ? (
@@ -906,20 +876,20 @@ const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
                               </div>
                             )}
                           </div>
-                            {!task.guide &&(
-                              <div className="detail-item">
-                                <strong>{t('uploadGuide')}</strong>{" "}
-                                <div className="upload-icon-item">
-                                  <FeatherIcon name="upload" />
-                                  <input
-                                    type="file"
-                                    name="guide"
-                                    onClick={(e) => e.stopPropagation()}
-                                    onChange={(e) => handleGuideUpload(e, task._id)}
-                                  />
-                                </div>
+                          {!task.guide &&(
+                            <div className="detail-item">
+                              <strong>{t('uploadGuide')}</strong>{" "}
+                              <div className="upload-icon-item">
+                                <FeatherIcon name="upload" />
+                                <input
+                                  type="file"
+                                  name="guide"
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) => handleGuideUpload(e, task._id)}
+                                />
                               </div>
-                            )}
+                            </div>
+                          )}
 
                           {task?.guide && (
                             <div className="detail-item">
@@ -928,47 +898,100 @@ const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
                               </a>
                             </div>
                           )}
+                          {task?.upload && (
+                            <>
+                              <div className="detail-item">
+                                <a href={task.upload} target="_blank" rel="noreferrer">
+                                  <FeatherIcon name="file-text" />
+                                  <span>{formatFilename(task.upload)}</span>
+                                </a>
+                              </div>
+                              <button
+                                className="aprove-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleApprove(task._id);
+                                }}
+                              >
+                                <FeatherIcon name="check" />
+                                <span>{t('approveFile')}</span>
+                              </button>
+                              <button
+                                className="reject-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRejectClick(task);
+                                }}
+                              >
+                                <FeatherIcon name="x" />
+                                <span>{t('rejectFile')}</span>
+                              </button>
+                            </>
+                          )}
                       </div>
 
                       {/* Grid extra para subTasks */}
                       {task?.subTasks?.length > 0 && (
                       <div
                         className="detail-grid-accountant"
-                        style={{ marginTop: "15px", borderTop: "1px solid #ddd", paddingTop: "10px" }}
+                        style={{ marginTop: "15px", paddingTop: "10px" }}
                       >
                         {task.subTasks.map((sub: SubTask, index: number) => (
                           <React.Fragment key={index}>
-                            {sub.upload && (
-                              <>
-                                <div className="detail-item">
-                                  <a href={sub.upload} target="_blank" rel="noreferrer">
-                                    <img src="/file-text.png" alt="" />
-                                    <span>{formatFilename(sub.upload)}</span>
-                                  </a>
+                            
+                            <div className="detail-item">
+                              <strong>{t('paymentId')}</strong>{" "}
+                              {sub.payment_id ? (
+                                <span>{sub.payment_id}</span>
+                              ) : (
+                                <div className="upload-icon">
+                                  <input
+                                    type="text"
+                                    name="paymentId"
+                                    placeholder="type payment ID"
+                                    value={paymentInput[task._id] || ""}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) =>
+                                      setPaymentInput((prev) => ({ ...prev, [task._id]: e.target.value }))
+                                    }
+                                  />
+                                  <span
+                                    style={{ cursor: "pointer", display: "inline-flex" }}
+                                    onClick={() => handleAddPaymentId(task._id)}
+                                  >
+                                    <FeatherIcon name="plus" />
+                                  </span>
                                 </div>
-                                <button
-                                  className="aprove-btn"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleApprove(sub.payment_id);
-                                  }}
-                                >
-                                  <img src="/check.png" alt="" />
-                                  <span>{t('approveFile')}</span>
-                                </button>
-                                <button
-                                  className="reject-btn"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRejectClick(sub);
-                                  }}
-                                >
-                                  <img src="/check.png" alt="" />
-                                  <span>{t('rejectFile')}</span>
-                                </button>
-                              </>
-                            )}
-                            {!task.guide &&(
+                              )}
+                            </div>
+
+                            <div className="detail-item">
+                              <strong>{t('amount')}</strong>{" "}
+                              {sub.amount ? (
+                                <span>{sub.amount} mzn</span>
+                              ) : (
+                                <div className="upload-icon">
+                                  <input
+                                    type="number"
+                                    name="amount"
+                                    placeholder="Type amount"
+                                    value={amountInput[task._id] || ""}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) =>
+                                      setAmountInput((prev) => ({ ...prev, [task._id]: Number(e.target.value) }))
+                                    }
+                                  />
+                                  <span
+                                    style={{ cursor: "pointer", display: "inline-flex" }}
+                                    onClick={() => handleAddAmount(task._id)}
+                                  >
+                                    <FeatherIcon name="plus" />
+                                  </span>
+                                </div>
+                              )} 
+                            </div>
+
+                            {!sub.guide &&(
                               <div className="detail-item">
                                 <strong>{t('uploadGuide')}</strong>{" "}
                                 <div className="upload-icon-item">
@@ -1018,6 +1041,37 @@ const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
                                   {t('checkGuidePdf')}
                                 </a>
                               </div>
+                            )}
+
+                            {sub.upload && (
+                              <>
+                                <div className="detail-item">
+                                  <a href={sub.upload} target="_blank" rel="noreferrer">
+                                    <img src="/file-text.png" alt="" />
+                                    <span>{formatFilename(sub.upload)}</span>
+                                  </a>
+                                </div>
+                                <button
+                                  className="aprove-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleApprove(sub.payment_id);
+                                  }}
+                                >
+                                  <img src="/check.png" alt="" />
+                                  <span>{t('approveFile')}</span>
+                                </button>
+                                <button
+                                  className="reject-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRejectClick(sub);
+                                  }}
+                                >
+                                  <img src="/check.png" alt="" />
+                                  <span>{t('rejectFile')}</span>
+                                </button>
+                              </>
                             )}
                           </React.Fragment>
                         ))}
