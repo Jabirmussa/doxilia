@@ -1,5 +1,4 @@
 /* RejectModal.module.css */
-
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -79,6 +78,9 @@
   font-weight: bold;
   svg path{
     stroke: #fff;
+  }
+  span{
+    margin-right: 30px;
   }
 }
 

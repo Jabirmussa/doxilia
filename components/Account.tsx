@@ -48,10 +48,13 @@ export default function Account() {
       setUserType(rawRole);
 
       try {
-        const res = await fetch(`/api/${role}/${userId}`);
+        const res = await fetch(`/api/${role}/${userId}`, {
+          next: { revalidate: 5 }
+        });
         if (!res.ok) throw new Error('Erro ao buscar dados');
 
         const data = await res.json();
+        console.log('Dados do usuário:', data);
         setUserData(data);
       } catch (err) {
         console.error('Erro ao carregar dados do usuário:', err);

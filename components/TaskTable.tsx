@@ -74,11 +74,12 @@ const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
       if (!role || !userId) return;
     async function fetchTasks() {
       try {
-        const res = await fetch("/api/tasks");
+        const res = await fetch("/api/tasks", {
+          next: { revalidate: 5 }
+        });
         if (!res.ok) throw new Error("Erro ao buscar tasks");
 
         const data = await res.json();
-        console.log("Tasks fetched:", data.tasks);
 
         const filtered = data.tasks.filter((task: Task) => {
           if (role === "admin") return true;
@@ -561,8 +562,8 @@ const TaskTable: React.FC<TaskTableProps> = ({ type, onNavigate }) => {
                     ? "Draft"
                     : task.status.toLowerCase() === "open"
                     ? role === "accountant"
-                      ? "Waiting Client"
-                      : "Make Payment"
+                      ? t('WaitingClient')
+                      : t('MakePayment')
                     : task.status.toLowerCase() === "close"
                     ? "closed"
                     : task.status.toLowerCase() === "checking"

@@ -84,4 +84,7 @@ export const dictionary = {
   chooseFile: "Choose File",
   waitingAmount: "Waiting for amount...",
   type: "Type",
+  WaitingClient: "Waiting Client",
+  typeHere: "Type here",
+
 };

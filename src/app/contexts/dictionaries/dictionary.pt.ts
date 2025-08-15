@@ -91,5 +91,7 @@ export const dictionary = {
   searchInTasks: "Pesquisar por tarefas",
   chooseFile: "Escolher File",
   waitingAmount: "Aguardando valor...",
-  type: "Tipo"
+  type: "Tipo",
+  WaitingClient: "Aguardando Cliente",
+  typeHere: "Digite aqui",
 };
