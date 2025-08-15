@@ -59,7 +59,6 @@ export default function Allclients({ onNavigate }: Props) {
     fetchData();
   }, []);
 
-
   return (
     <div className="all-clients">
       <div className="client-list-header">
@@ -94,8 +93,8 @@ export default function Allclients({ onNavigate }: Props) {
                   <p>
                     {clientTasks.length} {clientTasks.length === 1 ? "task" : "tasks"} open
                   </p>
-
                 </div>
+                
                 <div className="add-task-open-btn">
                   <button
                     onClick={() => {
